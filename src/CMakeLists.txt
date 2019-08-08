@@ -59,6 +59,7 @@ set(src ${tbabm} ${demographic} ${hiv} ${tb} ${individual} ${household})
 include_directories(${Boost_INCLUDE_DIRS})
 
 configure_file("RunTBABM" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RunTBABM" COPYONLY)
+configure_file("CalibrateTBABM" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CalibrateTBABM" COPYONLY)
 configure_file("household_structure.csv" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/household_structure.csv" COPYONLY)
 
 add_executable(TBABM ${src})
