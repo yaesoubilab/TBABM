@@ -17,6 +17,25 @@ ReformatRawCalibData <- function(d) {
 }
 
 #########################################################
+## CLI
+#########################################################
+main <- function(args) {
+  n_args <- length(args)
+  print(args[2])
+  print(n_args)
+  if (n_args == 0){
+     popSize <- 36500
+  }
+  else if (args[1] == "-s" && n_args == 2){
+     popSize <- args[2]
+  }
+  else{
+     popSize <- 36500
+  }
+}
+
+main(commandArgs(trailingOnly=TRUE))
+#########################################################
 ## Real data
 #########################################################
 calibrationData_raw <- tibble::tibble(
@@ -40,7 +59,6 @@ tar_prevalence_HIV <- list(type='TS',
 
 targets <- list(HIVPrevalence=tar_prevalence_HIV)
 
-fakePopSize <- 500
 
 # Open 'stdin' as a file descriptor
 f <- file("stdin")
@@ -52,7 +70,7 @@ while(length(line <- readLines(f, n = 1)) > 0){
   # cd into the directory given by the line, generate a likelihood,
   # cd back out, and print the likelihood to stdout
   setwd(line)
-  likelihood <- EasyCalibrator::CalibrateTargets(targets)
+  likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = main::popSize)
   setwd('..')
 
   write(paste0(line, ',', as.character(likelihood)),
