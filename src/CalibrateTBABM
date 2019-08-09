@@ -71,7 +71,7 @@ while(length(line <- readLines(f, n = 1)) > 0){
 
   # cd into the directory given by the line, generate a likelihood,
   # cd back out, and print the likelihood to stdout
-  update_line <- str_extract(line, "/^[^abc]*/")
+  update_line <- str_extract(line, "^\\d+")
   setwd(update_line)
   try(likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
   setwd('..')
