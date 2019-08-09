@@ -226,13 +226,17 @@ ps_opts="-j $N_JOBS --delay 0.2 --joblog parallel.log"
 pc_opts="$ps_opts --pipe --cat -N1 --tmpdir $TMPDIR" 
 
 function tbabm_coll () {
-  mkdir $2
+  PARAMFILE=$1
+  RUNNUM=$2
+  SEED=$3
 
-  TBABM_OPTS="-t $N_TRAJECTORIES -n $N_INDIVIDUALS -p $1 -s $RANDOM -o $2/ -m $N_THREADS -h household_structure.csv"
+  mkdir $RUNNUM
 
-  $srun $TBABM_BIN $TBABM_OPTS > $2/stdout.txt 2> $2/stderr.txt
+  TBABM_OPTS="-t $N_TRAJECTORIES -n $N_INDIVIDUALS -p $PARAMFILE -s $SEED -o $RUNNUM/ -m $N_THREADS -h household_structure.csv"
 
-  echo $2
+  $srun $TBABM_BIN $TBABM_OPTS > $RUNNUM/stdout.txt 2> $RUNNUM/stderr.txt
+
+  echo "$RUNNUM,$SEED"
 }
 export N_TRAJECTORIES N_INDIVIDUALS N_THREADS srun TBABM_BIN
 export -f tbabm_coll
@@ -252,7 +256,7 @@ if [[ "$COLLATE" = "false" ]]; then
   seq -w $N_RUNSHEETS | parallel $ps_opts $srun $tbabm '>' {}.log '2>&1;' echo {}
 else
   cat $COLLATED_FILE | 
-    parallel $pc_opts tbabm_coll {} '{#}' 
+    parallel $pc_opts tbabm_coll {} '{#}' '$RANDOM'
     # CalibrateTBABM
     # parallel -j1 analyze |
     # ./pipes.R |
