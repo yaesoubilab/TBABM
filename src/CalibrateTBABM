@@ -23,14 +23,15 @@ main <- function(args) {
   n_args <- length(args)
   print(args[2])
   print(n_args)
+  popSize <- NULL
   if (n_args == 0){
-     popSize <- 36500
+     assign("popSize", 36500, envir = .GlobalEnv)
   }
   else if (args[1] == "-s" && n_args == 2){
-     popSize <- args[2]
+     assign("popSize", args[2], envir = .GlobalEnv)
   }
   else{
-     popSize <- 36500
+     assign("popSize", 36500, envir = .GlobalEnv)
   }
 }
 
@@ -70,7 +71,7 @@ while(length(line <- readLines(f, n = 1)) > 0){
   # cd into the directory given by the line, generate a likelihood,
   # cd back out, and print the likelihood to stdout
   setwd(line)
-  likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize)
+  try(likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
   setwd('..')
 
   write(paste0(line, ',', as.character(likelihood)),
