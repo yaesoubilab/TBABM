@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-library(EasyCalibrator)
-library(tibble)
+try(library(EasyCalibrator), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
+try(library(tibble), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
 
 #########################################################
 ## Real data: preprocessing functions
@@ -16,6 +16,26 @@ ReformatRawCalibData <- function(d) {
   purrr::map(tibbles[vars], ~dplyr::filter(., !is.na(value)))
 }
 
+#########################################################
+## CLI
+#########################################################
+main <- function(args) {
+  n_args <- length(args)
+  print(args[2])
+  print(n_args)
+  popSize <- NULL
+  if (n_args == 0){
+     assign("popSize", 36500, envir = .GlobalEnv)
+  }
+  else if (args[1] == "-s" && n_args == 2){
+     assign("popSize", args[2], envir = .GlobalEnv)
+  }
+  else{
+     assign("popSize", 36500, envir = .GlobalEnv)
+  }
+}
+
+main(commandArgs(trailingOnly=TRUE))
 #########################################################
 ## Real data
 #########################################################
@@ -40,7 +60,6 @@ tar_prevalence_HIV <- list(type='TS',
 
 targets <- list(HIVPrevalence=tar_prevalence_HIV)
 
-fakePopSize <- 500
 
 # Open 'stdin' as a file descriptor
 f <- file("stdin")
@@ -52,7 +71,7 @@ while(length(line <- readLines(f, n = 1)) > 0){
   # cd into the directory given by the line, generate a likelihood,
   # cd back out, and print the likelihood to stdout
   setwd(line)
-  likelihood <- EasyCalibrator::CalibrateTargets(targets)
+  try(likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
   setwd('..')
 
   write(paste0(line, ',', as.character(likelihood)),
