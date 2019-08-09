@@ -1,7 +1,15 @@
 #!/usr/bin/env Rscript
-try(library(EasyCalibrator), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
-try(library(tibble), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
-try(library(stringr), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
+try(library(EasyCalibrator),
+    silent = FALSE,
+    outFile = getOption("try.outFile",
+                        default = stderr()))
+
+try(library(tibble),
+    silent = FALSE,
+    outFile = getOption("try.outFile",
+                        default = stderr()))
+
+library(stringr)
 
 #########################################################
 ## Real data: preprocessing functions
