@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 try(library(EasyCalibrator), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
 try(library(tibble), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
+library(stringr)
 
 #########################################################
 ## Real data: preprocessing functions
@@ -70,10 +71,11 @@ while(length(line <- readLines(f, n = 1)) > 0){
 
   # cd into the directory given by the line, generate a likelihood,
   # cd back out, and print the likelihood to stdout
-  setwd(line)
+  update_line <- str_extract(line, "/^[^abc]*/")
+  setwd(update_line)
   try(likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
   setwd('..')
 
-  write(paste0(line, ',', as.character(likelihood)),
+  write(paste0(update_line, ',', as.character(likelihood)),
         stdout())
 }
