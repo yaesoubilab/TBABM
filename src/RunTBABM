@@ -5,26 +5,29 @@ function print_usage {
   echo "Usage:"
   echo "  RunTBABM -h"
   echo "    Print usage information and exit"
-  echo "  RunTBABM [options] -r rangefile -n num_runsheets"
+  echo "  RunTBABM -r rangefile -n num_runsheets [options]"
   echo "    Run TBABM on 'num_runsheets' runsheets from 'rangefile'"
+  echo "  RunTBABM -c runsheets_file [options]"
+  echo "    Run TBABM using each line of 'runsheets_file' as a rangefile"
+  echo '    Note: Must set environment variable $TMPFILE for storage of'
+  echo "          files containing the individual lines"
   echo
   echo "Options:"
   echo "  -b name       Name of the run. Used for naming sbatch jobs"
   echo "  -e address    Email when job is finished. To use with -q"
-  echo "  -c file       Collated. Each line of 'file' is a RunSheet."
-  echo "                No need to use -r or -n in this configuration"
   # echo "  -g            Graph the output"
   echo "  -i init_size  Initial size of population. Default 31000"
   echo "  -q            Run as a batch job through sbatch"
   echo "  -t num        Number of trajectories per runsheet. Default 4"
   echo "  -m num        Number of threads per process. Default 1"
   echo "  -j num        Number of jobs. Default 2"
+  echo "  -d min        Duration of job, in minutes. Only use with -q"
 }
 
 # See documentation of 'getopts' or 
 # https://sookocheff.com/post/bash/parsing-bash-script-arguments-with-shopts/
 # for more information about processing CLI arguments in Bash scripts
-optstring=":hb:r:n:t:qc:e:i:gm:j:"
+optstring=":hb:r:n:t:qc:e:i:gd:m:j:"
 
 # Make sure at least one argument was supplied. $# is the number of arguments
 # to the script.
@@ -34,6 +37,7 @@ if [[ $# -lt 1 ]]; then
 fi
 
 RUN_NAME="DefaultRunName"
+RUNTIME="10"
 RANGEFILE=""
 N_RUNSHEETS=0
 N_TRAJECTORIES=4
@@ -55,9 +59,20 @@ while getopts $optstring opt; do
     c )
       COLLATED=true; COLLATED_FILE=$OPTARG
       RUNTBABM_OPTSTRING+="-c $OPTARG "
+
+      # Ensure that the $TMPDIR which will be used to store temporary (1-line)
+      # files for model params is indeed a directory that can be written to.
+      if ! [[ -d $TMPDIR && -w $TMPDIR ]]; then
+        echo 'Error: -c flag but $TMPDIR was not a dir, or not writable' 1>&2
+        exit 1;
+      fi
+
       ;;
     h )
       print_usage; exit 0
+      ;;
+    d )
+      RUNTIME=$OPTARG;
       ;;
     b )
       RUN_NAME=$OPTARG; RUNTBABM_OPTSTRING+="-b $OPTARG "
@@ -116,7 +131,7 @@ fi
 
 if [[ "$DO_BATCH" = true ]]; then
   SBATCH_OPTSTRING=""
-  SBATCH_OPTSTRING+='--time=00:30:00 '
+  SBATCH_OPTSTRING+="--time=$RUNTIME "
   SBATCH_OPTSTRING+='--partition=general '
   SBATCH_OPTSTRING+="--job-name=$RUN_NAME "
   SBATCH_OPTSTRING+='--output=slurm.log '
@@ -163,7 +178,7 @@ if which 'srun' > /dev/null; then
   # This specifies the options used to run srun. The "-N1 -n1" options are
   # used to allocates a single core to each task (a task is one model run,
   # which may include multiple trajectories).
-  srun="srun -n1 --cpus-per-task $N_THREADS --exclusive";
+  srun="srun -N1 -n1 --cpus-per-task $N_THREADS --exclusive";
 fi
 
 # Remove existing result directories that would conflict with the ones that
@@ -208,7 +223,7 @@ tbabm="$TBABM_BIN $TBABM_OPTSTRING"
 #   can be used to monitor progress.
 #
 ps_opts="-j $N_JOBS --delay 0.2 --joblog parallel.log"
-pc_opts="$ps_opts --pipe --cat -N1"
+pc_opts="$ps_opts --pipe --cat -N1 --tmpdir $TMPDIR" 
 
 function tbabm_coll () {
   mkdir $2
@@ -237,11 +252,12 @@ if [[ "$COLLATE" = "false" ]]; then
   seq -w $N_RUNSHEETS | parallel $ps_opts $srun $tbabm '>' {}.log '2>&1;' echo {}
 else
   cat $COLLATED_FILE | 
-    parallel $pc_opts tbabm_coll {} '{#}'
+    parallel $pc_opts tbabm_coll {} '{#}' 
+    # CalibrateTBABM
     # parallel -j1 analyze |
     # ./pipes.R |
     # parallel -j1 remove # &&
-  # ./likelihoods.R < results.csv
+    # ./likelihoods.R < results.csv
 fi
 
 exit $?;
