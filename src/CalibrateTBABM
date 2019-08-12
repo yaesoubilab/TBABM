@@ -92,6 +92,6 @@ while(length(line <- readLines(f, n = 1)) > 0){
   tryInform(setwd('..'),
             paste0("Could not exit '",line,"' after calculating likelihood"))   
 
-  write(paste0(update_line, ',', as.character(likelihood)),
+  write(paste0(line, ',', as.character(likelihood)),
         stdout())
 }
