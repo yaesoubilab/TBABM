@@ -1,14 +1,6 @@
 #!/usr/bin/env Rscript
-try(library(EasyCalibrator),
-    silent = FALSE,
-    outFile = getOption("try.outFile",
-                        default = stderr()))
-
-try(library(tibble),
-    silent = FALSE,
-    outFile = getOption("try.outFile",
-                        default = stderr()))
-
+library(EasyCalibrator)
+library(tibble)
 library(stringr)
 
 #########################################################
@@ -69,20 +61,36 @@ tar_prevalence_HIV <- list(type='TS',
 
 targets <- list(HIVPrevalence=tar_prevalence_HIV)
 
+tryInform <- function(code, message) {
+  handleError <- function(c) {
+    c$message <- paste0(c$message, "\n", '(', message, ')')
+    stop(c)
+  }
+
+  tryCatch(code, error=handleError)
+}
 
 # Open 'stdin' as a file descriptor
-f <- file("stdin")
-open(f)
+f <- tryInform({f <- file('stdin'); open(f); f},
+               "Could not open 'stdin' for reading")
 
 # Read one line at a time until EOF
 while(length(line <- readLines(f, n = 1)) > 0){
 
-  # cd into the directory given by the line, generate a likelihood,
-  # cd back out, and print the likelihood to stdout
-  update_line <- str_extract(line, "^\\d+")
-  setwd(update_line)
-  try(likelihood <- EasyCalibrator::CalibrateTargets(targets, popSize = popSize), silent = FALSE, outFile = getOption("try.outFile", default = stderr()))
-  setwd('..')
+  # Each line should begin with a number, which is the folder name
+  # containing the files to be calibrated
+  line <- stringr::str_extract(line, "^\\d+")
+
+  # Try to go into this directory
+  tryInform(setwd(line),
+            paste0("Could not open '", line, "' as directory"))   
+
+  # Try to calibrate the model whose results are in this directory
+  msg        <- paste0("Error in calculating likelihood for '", line, "'")
+  likelihood <- tryInform(CalibrateTargets(targets, popSize=popSize), msg) 
+  
+  tryInform(setwd('..'),
+            paste0("Could not exit '",line,"' after calculating likelihood"))   
 
   write(paste0(update_line, ',', as.character(likelihood)),
         stdout())
