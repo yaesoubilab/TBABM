@@ -22,9 +22,7 @@ ReformatRawCalibData <- function(d) {
 #########################################################
 main <- function(args) {
   n_args <- length(args)
-  print(args[2])
-  print(n_args)
-  popSize <- NULL
+  popSize <<- NULL
   if (n_args == 0){
      assign("popSize", 36500, envir = .GlobalEnv)
   }
@@ -35,8 +33,9 @@ main <- function(args) {
      assign("popSize", 36500, envir = .GlobalEnv)
   }
 }
-
 main(commandArgs(trailingOnly=TRUE))
+
+print(popSize)
 #########################################################
 ## Real data
 #########################################################
