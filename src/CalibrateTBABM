@@ -18,23 +18,6 @@ ReformatRawCalibData <- function(d) {
 }
 
 #########################################################
-## CLI
-#########################################################
-main <- function(args) {
-  n_args <- length(args)
-  popSize <<- NULL
-  if (n_args == 0){
-     assign("popSize", 36500, envir = .GlobalEnv)
-  }
-  else if (args[1] == "-s" && n_args == 2){
-     assign("popSize", args[2], envir = .GlobalEnv)
-  }
-  else{
-     assign("popSize", 36500, envir = .GlobalEnv)
-  }
-}
-main(commandArgs(trailingOnly=TRUE))
-#########################################################
 ## Real data
 #########################################################
 calibrationData_raw <- tibble::tibble(
@@ -58,6 +41,10 @@ tar_prevalence_HIV <- list(type='TS',
 
 targets <- list(HIVPrevalence=tar_prevalence_HIV)
 
+#########################################################
+## Error handling
+#########################################################
+
 tryInform <- function(code, message) {
   handleError <- function(c) {
     c$message <- paste0(c$message, "\n", '(', message, ')')
@@ -67,28 +54,52 @@ tryInform <- function(code, message) {
   tryCatch(code, error=handleError)
 }
 
-# Open 'stdin' as a file descriptor
-f <- tryInform({f <- file('stdin'); open(f); f},
-               "Could not open 'stdin' for reading")
+#########################################################
+## Main loop
+#########################################################
 
-# Read one line at a time until EOF
-while(length(line <- readLines(f, n = 1)) > 0){
+processLines <- function(popSize) {
+  # Open 'stdin' as a file descriptor
+  f <- tryInform({f <- file('stdin'); open(f); f},
+                 "Could not open 'stdin' for reading")
 
-  # Each line should begin with a number, which is the folder name
-  # containing the files to be calibrated
-  line <- stringr::str_extract(line, "^\\d+")
+  # Read one line at a time until EOF
+  while(length(line <- readLines(f, n = 1)) > 0){
 
-  # Try to go into this directory
-  tryInform(setwd(line),
-            paste0("Could not open '", line, "' as directory"))   
+    # Each line should begin with a number, which is the folder name
+    # containing the files to be calibrated
+    line <- stringr::str_extract(line, "^\\d+")
 
-  # Try to calibrate the model whose results are in this directory
-  msg        <- paste0("Error in calculating likelihood for '", line, "'")
-  likelihood <- tryInform(CalibrateTargets(targets, popSize=popSize), msg) 
-  
-  tryInform(setwd('..'),
-            paste0("Could not exit '",line,"' after calculating likelihood"))   
+    # Try to go into this directory
+    tryInform(setwd(line),
+              paste0("Could not open '", line, "' as directory"))   
 
-  write(paste0(line, ',', as.character(likelihood)),
-        stdout())
+    # Try to calibrate the model whose results are in this directory
+    msg        <- paste0("Error in calculating likelihood for '", line, "'")
+    likelihood <- tryInform(CalibrateTargets(targets, popSize=popSize), msg) 
+    
+    tryInform(setwd('..'),
+              paste0("Could not exit '",line,"' after calculating likelihood"))   
+
+    write(paste0(line, ',', as.character(likelihood)),
+          stdout())
+  }
 }
+
+#########################################################
+## CLI
+#########################################################
+main <- function(args) {
+  n_args       <- length(args)
+  flagged      <- args[1] == "-s" && n_args == 2
+  default.size <- 36500
+
+  if (!n_args %in% c(0,2))
+    stop("Usage: CalibrateTBABM [-s populationSize]")
+
+  popSize <- ifelse(flagged, args[2], 36500)
+
+  processLines(popSize)
+}
+
+main(commandArgs(trailingOnly=TRUE)) 
