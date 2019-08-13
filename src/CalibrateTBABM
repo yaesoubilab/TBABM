@@ -68,18 +68,18 @@ processLines <- function(popSize) {
 
     # Each line should begin with a number, which is the folder name
     # containing the files to be calibrated
-    line <- stringr::str_extract(line, "^\\d+")
+    runID <- stringr::str_extract(line, "^\\d+")
 
     # Try to go into this directory
-    tryInform(setwd(line),
-              paste0("Could not open '", line, "' as directory"))   
+    tryInform(setwd(runID),
+              paste0("Could not open '", runID, "' as directory"))   
 
     # Try to calibrate the model whose results are in this directory
-    msg        <- paste0("Error in calculating likelihood for '", line, "'")
+    msg        <- paste0("Error in calculating likelihood for '", runID, "'")
     likelihood <- tryInform(CalibrateTargets(targets, popSize=popSize), msg) 
     
     tryInform(setwd('..'),
-              paste0("Could not exit '",line,"' after calculating likelihood"))   
+              paste0("Could not exit '",runID,"' after calculating likelihood"))   
 
     write(paste0(line, ',', as.character(likelihood)),
           stdout())

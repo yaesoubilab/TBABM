@@ -1,0 +1,58 @@
+#!/usr/bin/env Rscript
+library(EasyCalibrator)
+library(stringr)
+library(assertthat)
+
+tryInform <- function(code, message) {
+  handleError <- function(c) {
+    c$message <- paste0(c$message, "\n", '(', message, ')')
+    stop(c)
+  }
+
+  tryCatch(code, error=handleError)
+}
+
+MockNormalize <- function(lks) lks / sum(lks)
+
+processLines <- function() {
+  # Open 'stdin' as a file descriptor
+  f <- tryInform({f <- file('stdin'); open(f); f},
+                 "Could not open 'stdin' for reading")
+
+  lines    <- c(character())
+  sep      <- ','
+  ncols    <- 3
+  colnames <- c('run_id', 'seed', 'likelihood')
+  
+  # Read one line at a time until EOF
+  while(length(line <- readLines(f, n = 1)) > 0)
+    lines <- append(lines, line)
+
+  # Split each line by its separator, assign column names, and convert
+  # the resultant matrix to a tibble
+  split_lines           <- str_split_fixed(lines, sep, n=ncols)
+  colnames(split_lines) <- colnames
+  results               <- tibble::as_tibble(split_lines)
+
+  # A few tests on the output of str_split_fixed() to detect errors coming
+  # from 'stdin'
+  assert_that(noNA(results$run_id),     msg=">= 1 run_id (col 1) was NA")
+  assert_that(noNA(results$seed),       msg=">= 1 seed (col 2) was NA")
+  assert_that(noNA(results$likelihood), msg=">= 1 likelihood (col 3) was NA")
+
+  # Try to normalize all the likelihoods, and catch errors that arise
+  normalized <- tryInform(MockNormalize(as.double(results$likelihood)),
+                          "MockNormalize failed:")
+
+  # Add the normalized likelihoods as the fourth column of the output
+  results <- dplyr::mutate(results, normalized=normalized)
+
+  tryInform(cat(readr::format_csv(results, col_names=FALSE), file=stdout()),
+            "Writing normalized likelihoods to 'stdout' failed.")
+}
+
+main <- function(args) {
+  processLines()
+}
+
+main(commandArgs(trailingOnly=TRUE))
