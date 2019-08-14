@@ -12,8 +12,6 @@ tryInform <- function(code, message) {
   tryCatch(code, error=handleError)
 }
 
-MockNormalize <- function(lks) lks / sum(lks)
-
 processLines <- function() {
   # Open 'stdin' as a file descriptor
   f <- tryInform({f <- file('stdin'); open(f); f},
@@ -40,19 +38,23 @@ processLines <- function() {
   assert_that(noNA(results$seed),       msg=">= 1 seed (col 2) was NA")
   assert_that(noNA(results$likelihood), msg=">= 1 likelihood (col 3) was NA")
 
+  log_lks <- as.double(dplyr::pull(results, likelihood))
+
+  assert_that(noNA(log_lks), msg="str -> dbl conversion of likelihoods failed")
+
   # Try to normalize all the likelihoods, and catch errors that arise
-  normalized <- tryInform(MockNormalize(as.double(results$likelihood)),
-                          "MockNormalize failed:")
+  normalized <- tryInform(ThresholdNorm(log_lks, -15),
+                          "ThresholdNorm failed")
 
   # Add the normalized likelihoods as the fourth column of the output
-  results <- dplyr::mutate(results, normalized=normalized)
+  results <- dplyr::bind_cols(results, list(normalized=normalized))
 
   tryInform(cat(readr::format_csv(results, col_names=FALSE), file=stdout()),
             "Writing normalized likelihoods to 'stdout' failed.")
 }
 
 main <- function(args) {
-  processLines()
+  withRestarts(processLines(), abort=function() quit())
 }
 
 main(commandArgs(trailingOnly=TRUE))
