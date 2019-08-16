@@ -1,3 +1,4 @@
+# Make tidyverse quiet!
 suppressPackageStartupMessages(library(tidyverse, quietly=TRUE, 
                    verbose=FALSE,
                    warn.conflicts=FALSE))
@@ -26,12 +27,41 @@ rangefile_spec <- cols(
   step = col_double()
 )
 
+# Cross all of the different parameter combinations together. The result of
+# this call is an unkeyed list of lists, where the innermost lists contain k-v
+# pairs. Each innermost list represents a set of parameters that will be used
+# to modify the prototype RunSheet. Thus, the keys of the innermost lists
+# correspond to the 'short-name' of a parameter, and the values, for right
+# now, are what 'parameter-1' should be set to.
+GenCombinations <- function(substitutions) {
+  pmap(substitutions, 
+       function(name, lower, upper, step) seq(lower, upper, step)) %>%
+    setNames(substitutions$name) %>%
+    cross()
+}
+
+# fname -> tibble containing a row for each run where the columns are
+# the various parameters
+GenCombinations_df <- function(rangefile_fname) {
+  substitutions <- read_csv(rangefile_fname, col_types=rangefile_spec) %>%
+    as.tibble()
+
+  pmap(substitutions,
+       function(name, lower, upper, step) seq(lower, upper, step)) %>%
+       setNames(substitutions$name) %>%
+       cross_df() %>%
+       mutate(run.id = seq(n())) %>%
+       select(run.id, everything())
+}
+
 GenRunSheets <- function(proto_fname, rangefile_fname) {
   
   # Read the prototype file and the substitutions file in and convert them to
   # tibbles
   proto <- read_csv(proto_fname, col_types=datasheet_spec) %>% as_tibble()
-  substitutions <- read_csv(rangefile_fname, col_types=rangefile_spec) %>% as_tibble()
+
+  substitutions <- read_csv(rangefile_fname, col_types=rangefile_spec) %>% 
+    as_tibble()
   
   # Cross all of the different parameter combinations together. The result of
   # this call is an unkeyed list of lists, where the innermost lists contain k-v
@@ -39,9 +69,7 @@ GenRunSheets <- function(proto_fname, rangefile_fname) {
   # to modify the prototype RunSheet. Thus, the keys of the innermost lists
   # correspond to the 'short-name' of a parameter, and the values, for right
   # now, are what 'parameter-1' should be set to.
-  crossed <- pmap(substitutions, 
-                  function(name, lower, upper, step) seq(lower, upper, step)) %>%
-    setNames(substitutions$name) %>% cross()
+  crossed <- GenCombinations(substitutions)
   
   # Given a list of substitutions, outputs a new parameter sheet, as a tibble, which
   # includes these substitutions
@@ -82,7 +110,6 @@ WriteRunSheets <- function(runsheets, prefix="RunSheet_") {
     # Write the .csv and .json files to disk. It's important to make sure NA is
     # represented as the empty string, so that an empty cell is represented as
     # ",,".
-    write_csv(runsheet, path_csv, na="")
     write_json(runsheet, path_json, na='null')
   }
   
@@ -109,8 +136,6 @@ main <- function(args) {
   proto_fname <- args[offset + 1]
   rangefile_fname <- args[offset + 2]
   
-  # GenPrefix <- function(rangefile_fname) 
-  #                paste0(tools::file_path_sans_ext(rangefile_fname), "_")
   GenPrefix <- function(rangefile_fname) return("")
   
   runsheets <- GenRunSheets(proto_fname, rangefile_fname)
@@ -120,32 +145,15 @@ main <- function(args) {
       paste(collapse="\n") %>% 
       write(file="runsheets.json")
     
-    iwalk(runsheets, ~write_csv(.x, "runsheets.csv", append=(.y != 1)))
+    # iwalk(runsheets, ~write_csv(.x, "runsheets.csv", append=(.y != 1)))
   } else {
     WriteRunSheets(runsheets, prefix="")
   }
   
-  # runsheet_sets <- map(rangefiles_fnames, ~GenRunSheets(proto_fname, .))
-  # runsheet_prefixes <- map(rangefiles_fnames, GenPrefix)
-  # runsheets_written <- map2(runsheet_sets, runsheet_prefixes,
-                            # ~WriteRunSheets(.x, prefix=.y))
+  write_csv(GenCombinations_df(rangefile_fname), 'runsheets.csv')
 }
 
 main(commandArgs(trailingOnly=TRUE))
-
-
-
-# for(i in c(-1:3, 9)) print(switch(i, 1,2,3,4))
-
-# test_sheets <- GenRunSheets("prototype.csv", "rangefile_example.csv")
-# InspectNewRunSheets(test_sheets, "rangefile_example.csv")
-# PlotNewRunSheets(test_sheets, "rangefile_example.csv")
-# WriteRunSheets(test_sheets, "TEST_")
-#
-# test_sheets_larger <- GenRunSheets("prototype.csv", "rangefile_example_larger.csv")
-# PlotNewRunSheets(test_sheets_larger, "rangefile_example_larger.csv")
-# WriteRunSheets(test_sheets_larger)
-
 
 # For each generated RunSheet, create a list of the parameters in that RunSheet
 # that were in the set of parameters that the rangefile designated as variable

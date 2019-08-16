@@ -95,56 +95,57 @@ bool ExportTrajectory(TBABM& t,
 					  std::shared_ptr<ofstream> deathSurvey)
 {
 	bool success {true};
+	long id {static_cast<long>(i)};
 
 	auto data = t.GetData();
 
-	success &= births.Add(                 std::move(std::make_shared<decltype(data.births)>(data.births)), i);
-	success &= deaths.Add(                 std::move(std::make_shared<decltype(data.deaths)>(data.deaths)), i);
-	success &= marriages.Add(              std::move(std::make_shared<decltype(data.marriages)>(data.marriages)), i);
-	success &= divorces.Add(               std::move(std::make_shared<decltype(data.divorces)>(data.divorces)), i);
-	success &= households.Add(             std::move(std::make_shared<decltype(data.householdsCount)>(data.householdsCount)), i);
-	success &= singleToLooking.Add(        std::move(std::make_shared<decltype(data.singleToLooking)>(data.singleToLooking)), i);
+	success &= births.Add(                 std::move(std::make_shared<decltype(data.births)>(data.births)), id);
+	success &= deaths.Add(                 std::move(std::make_shared<decltype(data.deaths)>(data.deaths)), id);
+	success &= marriages.Add(              std::move(std::make_shared<decltype(data.marriages)>(data.marriages)), id);
+	success &= divorces.Add(               std::move(std::make_shared<decltype(data.divorces)>(data.divorces)), id);
+	success &= households.Add(             std::move(std::make_shared<decltype(data.householdsCount)>(data.householdsCount)), id);
+	success &= singleToLooking.Add(        std::move(std::make_shared<decltype(data.singleToLooking)>(data.singleToLooking)), id);
 
-	success &= populationSize.Add(         std::move(std::make_shared<decltype(data.populationSize)>(data.populationSize)), i);
-	success &= populationChildren.Add(     std::move(std::make_shared<decltype(data.populationChildren)>(data.populationChildren)), i);
-	success &= populationAdults.Add(       std::move(std::make_shared<decltype(data.populationAdults)>(data.populationAdults)), i);
+	success &= populationSize.Add(         std::move(std::make_shared<decltype(data.populationSize)>(data.populationSize)), id);
+	success &= populationChildren.Add(     std::move(std::make_shared<decltype(data.populationChildren)>(data.populationChildren)), id);
+	success &= populationAdults.Add(       std::move(std::make_shared<decltype(data.populationAdults)>(data.populationAdults)), id);
 
-	success &= hivNegative.Add(            std::move(std::make_shared<decltype(data.hivNegative)>(data.hivNegative)), i);
-	success &= hivPositive.Add(            std::move(std::make_shared<decltype(data.hivPositive)>(data.hivPositive)), i);
-	success &= hivPositiveART.Add(         std::move(std::make_shared<decltype(data.hivPositiveART)>(data.hivPositiveART)), i);
-	success &= hivInfections.Add(          std::move(std::make_shared<decltype(data.hivInfections)>(data.hivInfections)), i);
-	success &= hivDiagnosed.Add(           std::move(std::make_shared<decltype(data.hivDiagnosed)>(data.hivDiagnosed)), i);
-	success &= hivDiagnosedVCT.Add(        std::move(std::make_shared<decltype(data.hivDiagnosedVCT)>(data.hivDiagnosedVCT)), i);
-	success &= hivDiagnosesVCT.Add(        std::move(std::make_shared<decltype(data.hivDiagnosesVCT)>(data.hivDiagnosesVCT)), i);
-	success &= tbInfections.Add(           std::move(std::make_shared<decltype(data.tbInfections)>(data.tbInfections)), i);
-	success &= tbIncidence.Add(            std::move(std::make_shared<decltype(data.tbIncidence)>(data.tbIncidence)), i);
-	success &= tbRecoveries.Add(           std::move(std::make_shared<decltype(data.tbRecoveries)>(data.tbRecoveries)), i);
-	success &= tbInfectionsHousehold.Add(  std::move(std::make_shared<decltype(data.tbInfectionsHousehold)>(data.tbInfectionsHousehold)), i);
-	success &= tbInfectionsCommunity.Add(  std::move(std::make_shared<decltype(data.tbInfectionsCommunity)>(data.tbInfectionsCommunity)), i);
-	success &= tbSusceptible.Add(          std::move(std::make_shared<decltype(data.tbSusceptible)>(data.tbSusceptible)), i);
-	success &= tbLatent.Add(               std::move(std::make_shared<decltype(data.tbLatent)>(data.tbLatent)), i);
-	success &= tbInfectious.Add(           std::move(std::make_shared<decltype(data.tbInfectious)>(data.tbInfectious)), i);
-	success &= tbExperienced.Add(		   std::move(std::make_shared<decltype(data.tbExperienced)>(data.tbExperienced)), i);
-	success &= tbTreatmentBegin.Add(       std::move(std::make_shared<decltype(data.tbTreatmentBegin)>(data.tbTreatmentBegin)), i);
-		success &= tbTreatmentBeginHIV.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginHIV)>(data.tbTreatmentBeginHIV)), i);
-		success &= tbTreatmentBeginChildren.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginChildren)>(data.tbTreatmentBeginChildren)), i);
-		success &= tbTreatmentBeginAdultsNaive.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginAdultsNaive)>(data.tbTreatmentBeginAdultsNaive)), i);
-		success &= tbTreatmentBeginAdultsExperienced.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginAdultsExperienced)>(data.tbTreatmentBeginAdultsExperienced)), i);
-	success &= tbTreatmentEnd.Add(         std::move(std::make_shared<decltype(data.tbTreatmentEnd)>(data.tbTreatmentEnd)), i);
-	success &= tbTreatmentDropout.Add(     std::move(std::make_shared<decltype(data.tbTreatmentDropout)>(data.tbTreatmentDropout)), i);
-	success &= tbInTreatment.Add(          std::move(std::make_shared<decltype(data.tbInTreatment)>(data.tbInTreatment)), i);
-	success &= tbCompletedTreatment.Add(   std::move(std::make_shared<decltype(data.tbCompletedTreatment)>(data.tbCompletedTreatment)), i);
-	success &= tbDroppedTreatment.Add(     std::move(std::make_shared<decltype(data.tbDroppedTreatment)>(data.tbDroppedTreatment)), i);
-	success &= pyramid.Add(                std::move(std::make_shared<decltype(data.pyramid)>(data.pyramid)), i);
-	success &= deathPyramid.Add(           std::move(std::make_shared<decltype(data.deathPyramid)>(data.deathPyramid)), i);
-	success &= hivInfectionsPyramid.Add(   std::move(std::make_shared<decltype(data.hivInfectionsPyramid)>(data.hivInfectionsPyramid)), i);
-	success &= hivPositivePyramid.Add(     std::move(std::make_shared<decltype(data.hivPositivePyramid)>(data.hivPositivePyramid)), i);
-	success &= tbExperiencedPyramid.Add(   std::move(std::make_shared<decltype(data.tbExperiencedPyr)>(data.tbExperiencedPyr)), i);
+	success &= hivNegative.Add(            std::move(std::make_shared<decltype(data.hivNegative)>(data.hivNegative)), id);
+	success &= hivPositive.Add(            std::move(std::make_shared<decltype(data.hivPositive)>(data.hivPositive)), id);
+	success &= hivPositiveART.Add(         std::move(std::make_shared<decltype(data.hivPositiveART)>(data.hivPositiveART)), id);
+	success &= hivInfections.Add(          std::move(std::make_shared<decltype(data.hivInfections)>(data.hivInfections)), id);
+	success &= hivDiagnosed.Add(           std::move(std::make_shared<decltype(data.hivDiagnosed)>(data.hivDiagnosed)), id);
+	success &= hivDiagnosedVCT.Add(        std::move(std::make_shared<decltype(data.hivDiagnosedVCT)>(data.hivDiagnosedVCT)), id);
+	success &= hivDiagnosesVCT.Add(        std::move(std::make_shared<decltype(data.hivDiagnosesVCT)>(data.hivDiagnosesVCT)), id);
+	success &= tbInfections.Add(           std::move(std::make_shared<decltype(data.tbInfections)>(data.tbInfections)), id);
+	success &= tbIncidence.Add(            std::move(std::make_shared<decltype(data.tbIncidence)>(data.tbIncidence)), id);
+	success &= tbRecoveries.Add(           std::move(std::make_shared<decltype(data.tbRecoveries)>(data.tbRecoveries)), id);
+	success &= tbInfectionsHousehold.Add(  std::move(std::make_shared<decltype(data.tbInfectionsHousehold)>(data.tbInfectionsHousehold)), id);
+	success &= tbInfectionsCommunity.Add(  std::move(std::make_shared<decltype(data.tbInfectionsCommunity)>(data.tbInfectionsCommunity)), id);
+	success &= tbSusceptible.Add(          std::move(std::make_shared<decltype(data.tbSusceptible)>(data.tbSusceptible)), id);
+	success &= tbLatent.Add(               std::move(std::make_shared<decltype(data.tbLatent)>(data.tbLatent)), id);
+	success &= tbInfectious.Add(           std::move(std::make_shared<decltype(data.tbInfectious)>(data.tbInfectious)), id);
+	success &= tbExperienced.Add(		   std::move(std::make_shared<decltype(data.tbExperienced)>(data.tbExperienced)), id);
+	success &= tbTreatmentBegin.Add(       std::move(std::make_shared<decltype(data.tbTreatmentBegin)>(data.tbTreatmentBegin)), id);
+		success &= tbTreatmentBeginHIV.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginHIV)>(data.tbTreatmentBeginHIV)), id);
+		success &= tbTreatmentBeginChildren.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginChildren)>(data.tbTreatmentBeginChildren)), id);
+		success &= tbTreatmentBeginAdultsNaive.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginAdultsNaive)>(data.tbTreatmentBeginAdultsNaive)), id);
+		success &= tbTreatmentBeginAdultsExperienced.Add(    std::move(std::make_shared<decltype(data.tbTreatmentBeginAdultsExperienced)>(data.tbTreatmentBeginAdultsExperienced)), id);
+	success &= tbTreatmentEnd.Add(         std::move(std::make_shared<decltype(data.tbTreatmentEnd)>(data.tbTreatmentEnd)), id);
+	success &= tbTreatmentDropout.Add(     std::move(std::make_shared<decltype(data.tbTreatmentDropout)>(data.tbTreatmentDropout)), id);
+	success &= tbInTreatment.Add(          std::move(std::make_shared<decltype(data.tbInTreatment)>(data.tbInTreatment)), id);
+	success &= tbCompletedTreatment.Add(   std::move(std::make_shared<decltype(data.tbCompletedTreatment)>(data.tbCompletedTreatment)), id);
+	success &= tbDroppedTreatment.Add(     std::move(std::make_shared<decltype(data.tbDroppedTreatment)>(data.tbDroppedTreatment)), id);
+	success &= pyramid.Add(                std::move(std::make_shared<decltype(data.pyramid)>(data.pyramid)), id);
+	success &= deathPyramid.Add(           std::move(std::make_shared<decltype(data.deathPyramid)>(data.deathPyramid)), id);
+	success &= hivInfectionsPyramid.Add(   std::move(std::make_shared<decltype(data.hivInfectionsPyramid)>(data.hivInfectionsPyramid)), id);
+	success &= hivPositivePyramid.Add(     std::move(std::make_shared<decltype(data.hivPositivePyramid)>(data.hivPositivePyramid)), id);
+	success &= tbExperiencedPyramid.Add(   std::move(std::make_shared<decltype(data.tbExperiencedPyr)>(data.tbExperiencedPyr)), id);
 
-	success &= tbTxExperiencedAdults.Add(               std::move(std::make_shared<decltype(data.tbTxExperiencedAdults)>(data.tbTxExperiencedAdults)), i);
-	success &= tbTxExperiencedInfectiousAdults.Add(     std::move(std::make_shared<decltype(data.tbTxExperiencedInfectiousAdults)>(data.tbTxExperiencedInfectiousAdults)), i);
-	success &= tbTxNaiveAdults.Add(                     std::move(std::make_shared<decltype(data.tbTxNaiveAdults)>(data.tbTxNaiveAdults)), i);
-	success &= tbTxNaiveInfectiousAdults.Add(           std::move(std::make_shared<decltype(data.tbTxNaiveInfectiousAdults)>(data.tbTxNaiveInfectiousAdults)), i);
+	success &= tbTxExperiencedAdults.Add(               std::move(std::make_shared<decltype(data.tbTxExperiencedAdults)>(data.tbTxExperiencedAdults)), id);
+	success &= tbTxExperiencedInfectiousAdults.Add(     std::move(std::make_shared<decltype(data.tbTxExperiencedInfectiousAdults)>(data.tbTxExperiencedInfectiousAdults)), id);
+	success &= tbTxNaiveAdults.Add(                     std::move(std::make_shared<decltype(data.tbTxNaiveAdults)>(data.tbTxNaiveAdults)), id);
+	success &= tbTxNaiveInfectiousAdults.Add(           std::move(std::make_shared<decltype(data.tbTxNaiveInfectiousAdults)>(data.tbTxNaiveInfectiousAdults)), id);
 
 
 	success &= activeHouseholdContacts.Add(std::move(std::make_shared<decltype(data.activeHouseholdContacts)>(data.activeHouseholdContacts)));
