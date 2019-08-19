@@ -4,7 +4,7 @@
 touch archive.tar 
 
 # pipe in the list of all folders and pipe them into tar with xargs
-ls-1 | xargs tar -xkrf archive.tar
+ls-1 | xargs tar -rf archive.tar
 
 #pipe in the stdout from archives to CalibrateTBABM
 tar -tvf archive.tar | Rscript CalibrateTBABM

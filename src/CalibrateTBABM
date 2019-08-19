@@ -3,6 +3,11 @@ library(EasyCalibrator)
 library(tibble)
 library(stringr)
 
+requireNamespace(purrr)
+requireNamespace(tibble)
+requireNamespace(dplyr)
+requireNamespace(stringr)
+
 #########################################################
 ## Real data: preprocessing functions
 #########################################################
