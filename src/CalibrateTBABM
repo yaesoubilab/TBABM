@@ -96,15 +96,14 @@ processLines <- function(popSize) {
 #########################################################
 main <- function(args) {
   n_args       <- length(args)
-  flagged      <- args[1] == "-s" && n_args == 2
-  default.size <- 36500
+  flagged      <- args[1] == "-t" && n_args == 2
 
   if (!n_args %in% c(0,2))
-    stop("Usage: CalibrateTBABM [-s populationSize]")
+    stop("Usage: CalibrateTBABM [-t filename]")
 
-  popSize <- ifelse(flagged, args[2], 36500)
+  ifelse(flagged, processLines(args[2]), write("TargetsSheet not used
+  (Implementation forthcoming)", stderr()))
 
-  processLines(popSize)
 }
 
 main(commandArgs(trailingOnly=TRUE)) 
