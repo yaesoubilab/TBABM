@@ -3,6 +3,9 @@ library(EasyCalibrator)
 library(stringr)
 library(assertthat)
 
+requireNamespace(tibble)
+requireNamespace(dplyr)
+
 tryInform <- function(code, message) {
   handleError <- function(c) {
     c$message <- paste0(c$message, "\n", '(', message, ')')
