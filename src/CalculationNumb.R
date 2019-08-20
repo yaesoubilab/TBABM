@@ -7,8 +7,21 @@ option_list <- list(
 
 parser <- parse_args(OptionParser(option_list=option_list))
 
-f <- file('stdin')
-open(f)
+#####################################################################################################     
+tryInform <- function(code, message) {
+  handleError <- function(c) {
+    c$message <- paste0(c$message, "\n", '(', message, ')')
+    stop(c)
+  }
+
+  tryCatch(code, error=handleError)
+}
+
+
+#####################################################################################################     
+
+f <- tryInform({f <- file('stdin'); open(f); f},
+              "Could not open 'stdin' for reading")
 
 if(parser$multiply & parser$add){
    write("Cannot have multiply and add flag", stderr())
@@ -19,6 +32,8 @@ if(parser$multiply==FALSE & parser$add==FALSE){
    write("Need to have either multiply or add flag", stderr())
    stop()
 }
+
+#####################################################################################################     
 
 if(parser$multiply){
    mult <- 1
