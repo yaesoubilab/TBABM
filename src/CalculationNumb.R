@@ -10,6 +10,16 @@ parser <- parse_args(OptionParser(option_list=option_list))
 f <- file('stdin')
 open(f)
 
+if(parser$multiply & parser$add){
+   write("Cannot have multiply and add flag", stderr())
+   stop()
+}
+
+if(parser$multiply==FALSE & parser$add==FALSE){
+   write("Need to have either multiply or add flag", stderr())
+   stop()
+}
+
 if(parser$multiply){
    mult <- 1
    while(length(line <- readLines(f, n = 1)) > 0){
