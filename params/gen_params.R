@@ -21,10 +21,10 @@ datasheet_spec <- cols(
 
 # Spec for the rangefile
 rangefile_spec <- cols(
-  name = col_character(),
+  name  = col_character(),
   lower = col_double(),
   upper = col_double(),
-  step = col_double()
+  step  = col_double()
 )
 
 # Cross all of the different parameter combinations together. The result of
