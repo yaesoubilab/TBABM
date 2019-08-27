@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+ARCHIVEERR="Error: Failed to specify archive name. Exiting"
+ARCHIVE=${1?ARCHIVEERR}
+
+# Make sure that the archive file doesn't already exist
+if [[ -a $ARCHIVE ]]; then
+  echo "Error: archive file $ARCHIVE already exists. Exiting" 1>&2;
+  exit 1;
+fi
+
+# Make sure that we can create a blank archive file to eventually
+# put the archive into
+if ! touch $ARCHIVE; then
+  echo "Error: archive file $ARCHIVE could not be created. Exiting" 1>&2;
+  exit 1;
+fi
+
+# Make a temporary file, which will hold the tarball, and make sure that 
+# if the program is forced to quit, it will delete this file
+progname=`basename $0`
+TMPFILE=`mktemp ${progname}.XXXXXX` || exit 1;
+trap "{ rm -f $TMPFILE; }" EXIT
+
+# Tar flags:
+# -v verbose
+# -u new entries won't be added unless they have a modification date newer
+#    than that of any corresponding file. A fancy version of the -r flag
+# -f output to the specified file
+#
+# Parallel call: 
+# The 'echo' call at the end of parallel's command is to make that as soon
+#   as a file is added to the archive, its name is echoed to stdout on success.
+# '-j1' ensure that race conditions won't occur, and '--halt' ensures that
+# as soon as an invocation of tar fails, parallel will exit.
+parallel -j1 --halt now,fail=1 \
+         tar -uf "$TMPFILE" {}'&& echo {}' :::: - ||
+  {(>&2 echo "Error: An invocation of tar failed."); exit 1;}
+
+# -z gunzip the archive that is created 
+(tar -czf "$ARCHIVE" "@$TMPFILE" && rm -r "$TMPFILE") || \
+  {(>&2 echo "Error: Gunzipping or rm'ing the TMPFILE failed."); exit 1;}
+
+# Convenient one-liners
+# 
+# List the contents of the archive:
+#   tar -tf fname
