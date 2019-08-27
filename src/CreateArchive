@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ARCHIVEERR="Error: Failed to specify archive name. Exiting"
-ARCHIVE=${1?ARCHIVEERR}
+ARCHIVE=${1?$ARCHIVEERR}
 
 # Make sure that the archive file doesn't already exist
 if [[ -a $ARCHIVE ]]; then
@@ -33,8 +33,9 @@ trap "{ rm -f $TMPFILE; }" EXIT
 #   as a file is added to the archive, its name is echoed to stdout on success.
 # '-j1' ensure that race conditions won't occur, and '--halt' ensures that
 # as soon as an invocation of tar fails, parallel will exit.
+FIRSTFIELD='{= $_ = (split /,/, $_)[0] =}'
 parallel -j1 --halt now,fail=1 \
-         tar -uf "$TMPFILE" {}'&& echo {}' :::: - ||
+         tar -uf "$TMPFILE" "$FIRSTFIELD" '&&' echo {} :::: - || \
   {(>&2 echo "Error: An invocation of tar failed."); exit 1;}
 
 # -z gunzip the archive that is created 
