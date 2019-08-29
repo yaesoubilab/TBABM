@@ -2,6 +2,8 @@
 library(EasyCalibrator)
 library(stringr)
 library(assertthat)
+library(tibble)
+library(dplyr)
 
 tryInform <- function(code, message) {
   handleError <- function(c) {

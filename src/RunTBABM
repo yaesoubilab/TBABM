@@ -22,6 +22,10 @@ function print_usage {
   echo "  -m num        Number of threads per process. Default 1"
   echo "  -j num        Number of jobs. Default 2"
   echo "  -d min        Duration of job, in minutes. Only use with -q"
+  echo
+  echo "Note: If 'srun' is present on the system, it will be used to"
+  echo "  execute the TBABM binary, even if not within the context of"
+  echo "  a job allocation."
 }
 
 # See documentation of 'getopts' or 
@@ -30,7 +34,7 @@ function print_usage {
 optstring=":hb:r:n:t:qc:e:i:gd:m:j:"
 
 # Make sure at least one argument was supplied. $# is the number of arguments
-# to the script.
+# to the script
 if [[ $# -lt 1 ]]; then
   echo "Error: Too few options" 1>&2
   exit 1;
@@ -40,7 +44,7 @@ RUN_NAME="DefaultRunName"
 RUNTIME="10"
 RANGEFILE=""
 N_RUNSHEETS=0
-N_TRAJECTORIES=4
+N_TRAJECTORIES=1
 N_THREADS=1
 N_JOBS=2
 N_INDIVIDUALS=31000
@@ -135,9 +139,9 @@ if [[ "$DO_BATCH" = true ]]; then
   SBATCH_OPTSTRING+='--partition=general '
   SBATCH_OPTSTRING+="--job-name=$RUN_NAME "
   SBATCH_OPTSTRING+='--output=slurm.log '
-  SBATCH_OPTSTRING+="--ntasks=$((N_JOBS+1)) "
+  SBATCH_OPTSTRING+="--ntasks=$((N_JOBS+1)) " # Extra job is for this script
   SBATCH_OPTSTRING+="--cpus-per-task=$N_THREADS "
-  SBATCH_OPTSTRING+='--mem-per-cpu=750M '
+  SBATCH_OPTSTRING+='--mem-per-cpu=750M ' # Approximate, could use tuning
 
   if [[ "$DO_EMAIL" = true ]]; then
     SBATCH_OPTSTRING+='--mail-type=ALL '
@@ -238,30 +242,14 @@ function tbabm_coll () {
 
   echo "$RUNNUM,$SEED"
 }
+
 export N_TRAJECTORIES N_INDIVIDUALS N_THREADS srun TBABM_BIN
 export -f tbabm_coll
-
-# function analyze () {
-#   ../src/summary_statistics.sh $1 >> results.csv # | tee -a results.csv 1>&2
-#   echo $1
-# }
-# export -f analyze
-# 
-# function remove () {
-#   rm -rf $1
-# }
-# export -f remove
 
 if [[ "$COLLATE" = "false" ]]; then
   seq -w $N_RUNSHEETS | parallel $ps_opts $srun $tbabm '>' {}.log '2>&1;' echo {}
 else
-  cat $COLLATED_FILE | 
-    parallel $pc_opts tbabm_coll {} '{#}' '$RANDOM'
-    # CalibrateTBABM
-    # parallel -j1 analyze |
-    # ./pipes.R |
-    # parallel -j1 remove # &&
-    # ./likelihoods.R < results.csv
+  parallel $pc_opts tbabm_coll {} '{#}' '$RANDOM' :::: $COLLATED_FILE
 fi
 
 exit $?;
