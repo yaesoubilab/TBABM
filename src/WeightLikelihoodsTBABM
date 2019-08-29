@@ -5,9 +5,6 @@ library(assertthat)
 library(tibble)
 library(dplyr)
 
-requireNamespace(tibble)
-requireNamespace(dplyr)
-
 tryInform <- function(code, message) {
   handleError <- function(c) {
     c$message <- paste0(c$message, "\n", '(', message, ')')

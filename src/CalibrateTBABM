@@ -6,11 +6,6 @@ library(stringr)
 library(purrr)
 library(dplyr)
 
-requireNamespace(purrr)
-requireNamespace(tibble)
-requireNamespace(dplyr)
-requireNamespace(stringr)
-
 #########################################################
 ## Real data: preprocessing functions
 #########################################################
