@@ -6,6 +6,11 @@ library(stringr)
 library(purrr)
 library(dplyr)
 
+requireNamespace(purrr)
+requireNamespace(tibble)
+requireNamespace(dplyr)
+requireNamespace(stringr)
+
 #########################################################
 ## Real data: preprocessing functions
 #########################################################
@@ -94,8 +99,7 @@ processLines <- function(popSize) {
 #########################################################
 main <- function(args) {
   n_args       <- length(args)
-  flagged      <- args[1] == "-s" && n_args == 2
-  default.size <- 36500
+  flagged      <- args[1] == "-t" && n_args == 2
 
   if (!n_args %in% c(2))
     stop("Usage: CalibrateTBABM -p popsize")

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+FIRSTFIELD='{= $_ = (split /,/, $_)[0] =}'
+
+parallel rm -rf "$FIRSTFIELD"';' echo {} :::: -
