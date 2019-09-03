@@ -16,10 +16,18 @@ if ! touch $ARCHIVE; then
   exit 1;
 fi
 
+# The following is code that was previously used to create temporary files,
+# this should be a better way to do it but for uninvestigated reasons did not
+# appear to work out-of-the-box on the cluster environment.
+# 
+# progname=`basename $0`
+# TMPFILE=`mktemp ${progname}.XXXXXX` || exit 1;
+
 # Make a temporary file, which will hold the tarball, and make sure that 
 # if the program is forced to quit, it will delete this file
-progname=`basename $0`
-TMPFILE=`mktemp ${progname}.XXXXXX` || exit 1;
+# trap "{ rm -f $TMPFILE; }" EXIT
+touch tmp.tar
+TMPFILE="tmp.tar"
 trap "{ rm -f $TMPFILE; }" EXIT
 
 # Tar flags:
@@ -32,14 +40,19 @@ trap "{ rm -f $TMPFILE; }" EXIT
 # The 'echo' call at the end of parallel's command is to make that as soon
 #   as a file is added to the archive, its name is echoed to stdout on success.
 # '-j1' ensure that race conditions won't occur, and '--halt' ensures that
-# as soon as an invocation of tar fails, parallel will exit.
+#   as soon as an invocation of tar fails, parallel will exit.
+# 
+# $FIRSTFIELD is a line of Perl code that splits the input line by the ','
+#   character, and then takes the first element of the resulting array.
 FIRSTFIELD='{= $_ = (split /,/, $_)[0] =}'
 parallel -j1 --halt now,fail=1 \
          tar -uf "$TMPFILE" "$FIRSTFIELD" '&&' echo {} :::: - || \
   {(>&2 echo "Error: An invocation of tar failed."); exit 1;}
 
-# -z gunzip the archive that is created 
-(tar -czf "$ARCHIVE" "@$TMPFILE" && rm -r "$TMPFILE") || \
+# Zip the tarball. Using 'gzip' is a good cross-platform way to ensure that
+# the items in the tarball become the contents of the archive, rather than
+# treating the tarball as an ordinary file.
+(gzip -c $TMPFILE > "$ARCHIVE" && rm -r "$TMPFILE") || \
   {(>&2 echo "Error: Gunzipping or rm'ing the TMPFILE failed."); exit 1;}
 
 # Convenient one-liners
