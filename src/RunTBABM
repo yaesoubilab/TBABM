@@ -66,7 +66,7 @@ while getopts $optstring opt; do
 
       # Ensure that the $TMPDIR which will be used to store temporary (1-line)
       # files for model params is indeed a directory that can be written to.
-      if ! [[ -d $TMPDIR && -w $TMPDIR ]]; then
+      if ! [[ -d "$TMPDIR" && -w "$TMPDIR" ]]; then
         echo 'Error: -c flag but $TMPDIR was not a dir, or not writable' 1>&2
         exit 1;
       fi
@@ -249,7 +249,8 @@ export -f tbabm_coll
 if [[ "$COLLATE" = "false" ]]; then
   seq -w $N_RUNSHEETS | parallel $ps_opts $srun $tbabm '>' {}.log '2>&1;' echo {}
 else
-  parallel $pc_opts tbabm_coll {} '{#}' '$RANDOM' :::: $COLLATED_FILE
+  cat "$COLLATED_FILE" |
+    parallel $pc_opts tbabm_coll {} '{#}' '$RANDOM' 
 fi
 
 exit $?;
