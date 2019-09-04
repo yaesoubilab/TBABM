@@ -41,12 +41,15 @@ trap "{ rm -f $TMPFILE; }" EXIT
 #   as a file is added to the archive, its name is echoed to stdout on success.
 # '-j1' ensure that race conditions won't occur, and '--halt' ensures that
 #   as soon as an invocation of tar fails, parallel will exit.
+# '-N50' adds 50 files at a time to the tarball. This appears more efficient
+#   when dealing with large numbers of files, probably because of seek times.
 # 
 # $FIRSTFIELD is a line of Perl code that splits the input line by the ','
 #   character, and then takes the first element of the resulting array.
 FIRSTFIELD='{= $_ = (split /,/, $_)[0] =}'
-parallel -j1 --halt now,fail=1 \
-         tar -uf "$TMPFILE" "$FIRSTFIELD" '&&' echo {} :::: - || \
+parallel -j1 -N50 --halt now,fail=1 \
+         tar -rf "$TMPFILE" "$FIRSTFIELD" '&&' \
+         printf '%b' '{}\\n' :::: - || \
   {(>&2 echo "Error: An invocation of tar failed."); exit 1;}
 
 # Zip the tarball. Using 'gzip' is a good cross-platform way to ensure that
