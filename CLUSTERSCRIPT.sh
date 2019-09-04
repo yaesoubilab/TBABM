@@ -7,14 +7,19 @@
 
 # Note: When invoking 'sbatch', you MUST specify --time=MINS and -n TASKS
 
+echo "Running on $(hostname)"
+
 # Load R, Anaconda, and TBABM. This gets all of the neccessary scripts into
 # our $PATH
-module load R
-module load miniconda
-module load TBABM/0.5.5
+module load foss/2018b parallel
+module load R miniconda
+
+module use ~/modulefiles
+module load TBABM/0.5.5-alpha4
 
 # Unload any existing environments and load all the R packages we will need,
-# EXCEPT EasyCalibrator, which must be installed on a per-user basis, manually.
+# EXCEPT EasyCalibrator, which must be installed on a per-user basis, manually,
+# before execution of this script.
 source deactivate
 source activate tbabm-0.5.5 # Our custom conda environment
 
@@ -26,10 +31,16 @@ source activate tbabm-0.5.5 # Our custom conda environment
 AUX_TASKS=1
 
 NTASKS=$SLURM_NTASKS # Number of tasks from Slurm
-NTASKS_MODEL=$((SLURM_NTASKS - AUX_TASKS)) # #tasks left for model
+NTASKS_MODEL=$((SLURM_NTASKS - AUX_TASKS)) # number of tasks left for model
 
 # Name of the archive to be created
 ARCHIVE_NAME="$SLURM_JOB_NAME"'_'"$SLURM_JOB_ID"'.tar.gz'
+
+mkdir -p tmpdir || {(>&2 echo 'Creation of tmpdir/ failed'); exit 1;}
+TMPDIR="$(pwd)/tmpdir"
+export TMPDIR
+
+touch monitor{1..3}.txt # files to intercept pipes
 
 # Make sure there's at least one task left for the model
 if [[ NTASKS_MODEL -lt 1 ]]; then
@@ -37,15 +48,16 @@ if [[ NTASKS_MODEL -lt 1 ]]; then
   exit 1;
 fi
 
-touch monitor{1..3}.txt # files to intercept pipes
-
-RunTBABM -c hiv_runsheets.json -i 500 -t1 -m1 -j $NTASKS_MODEL |
-  CreateArchive $ARCHIVE_NAME |
+time RunTBABM -c runsheets.json -i 30000 -t1 -m1 -j $NTASKS_MODEL |
+  CreateArchive "$ARCHIVE_NAME" |
     tee monitor1.txt |
-  CalibrateTBABM -p 500 |
+  CalibrateTBABM -p 30000 |
     tee monitor2.txt | 
   DeleteFolders |
   WeightLikelihoodsTBABM |
     tee monitor3.txt
 
-echo 'Pipeline has closed. Exit status:' $?
+echo 'Pipeline has closed. Exit status:' $? 1>&2
+
+rm -rf "$TMPDIR"
+
