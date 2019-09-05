@@ -30,8 +30,8 @@ calibrationData_raw <- tibble::tibble(
   notifiedTBChildren = c(82, 60, 66, 69, 73, 77, 69),
   notifiedTBExperiencedAdults = c(105, 119, 130, 109, 130, 126, 137),
   notifiedTBNaiveAdults = c(172, 234, 200, 224, 216, 233, 210),
-  prevalenceExperiencedAdults = 100*c(0.097, NA, NA, NA, NA, NA, NA),
   prevalenceHIV = c(0.052, NA, NA, NA, NA, NA, NA),
+  prevalenceExperiencedAdults = 100*c(0.097, NA, NA, NA, NA, NA, NA),
   prevalenceInfectiousNaiveAdults = 100*c(0.0051, NA, NA, NA, NA, NA, NA),
   prevalenceInfectiousExperiencedAdults = 100*c(0.0299, NA, NA, NA, NA, NA, NA)
 )
@@ -40,9 +40,28 @@ calibrationData <- ReformatRawCalibData(calibrationData_raw)
 
 tar_prevalence_HIV <- list(type='TS',
                            model=c('hivPositive', 'populationSize'),
-                           observed=calibrationData$prevalenceHIV)
+                           observed=calibrationData$prevalenceHIV,
+                           size=1894)
 
-targets <- list(HIVPrevalence=tar_prevalence_HIV)
+tar_prev_exp_adults <- list(type='TS',
+                           model=c('tbTxExperiencedAdults', 'populationSize'),
+                           observed=calibrationData$prevalenceExperiencedAdults,
+                           size=2781)
+
+tar_prev_inf_naive_adults <- list(type='TS',
+                           model=c('tbTxNaiveInfectiousAdults', 'tbTxNaiveAdults'),
+                           observed=calibrationData$prevalenceInfectiousNaiveAdults,
+                           size=3119)
+
+tar_prev_inf_exp_adults <- list(type='TS',
+                           model=c('tbTxExperiencedInfectiousAdults', 'tbTxExperiencedAdults'),
+                           observed=calibrationData$prevalenceInfectiousExperiencedAdults,
+                           size=338)
+
+targets <- list(HIVPrevalence =         tar_prevalence_HIV,
+                ExperiencedAdults =     tar_prev_exp_adults,
+                NaiveInfectiousAdults = tar_prev_inf_naive_adults,
+                ExpInfectiousAdults =   tar_prev_inf_exp_adults)
 
 #########################################################
 ## Error handling
