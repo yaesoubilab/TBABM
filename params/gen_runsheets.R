@@ -1,22 +1,33 @@
+#!/usr/bin/env Rscript
+
 # Make tidyverse quiet!
 suppressPackageStartupMessages(library(tidyverse, quietly=TRUE, 
                    verbose=FALSE,
                    warn.conflicts=FALSE))
-library(tools)
-library(jsonlite)
+library(tools, quietly=TRUE)
+library(jsonlite, quietly=TRUE, warn.conflicts=FALSE)
+library(optparse, quietly=TRUE)
+
 
 # Spec for the RunSheet
-datasheet_spec <- cols(
-  description = col_character(),
-  `short-name` = col_character(),
-  type = col_character(),
-  distribution = col_character(),
-  `parameter-description` = col_character(),
-  `parameter-1` = col_double(),
-  `parameter-2` = col_double(),
-  `parameter-3` = col_double(),
-  `parameter-4` = col_double(),
+runsheet_spec <- cols(
+  description               = col_character(),
+  `short-name`              = col_character(),
+  type                      = col_character(),
+  distribution              = col_character(),
+  `parameter-description`   = col_character(),
+  `parameter-1`             = col_double(),
+  `parameter-2`             = col_double(),
+  `parameter-3`             = col_double(),
+  `parameter-4`             = col_double(),
   `included-in-calibration` = col_logical()
+)
+
+# Spec for the priorfile
+priorfile_spec <- cols(
+  name  = col_character(),
+  lower = col_double(),
+  upper = col_double()
 )
 
 # Spec for the rangefile
@@ -58,7 +69,7 @@ GenRunSheets <- function(proto_fname, rangefile_fname) {
   
   # Read the prototype file and the substitutions file in and convert them to
   # tibbles
-  proto <- read_csv(proto_fname, col_types=datasheet_spec) %>% as_tibble()
+  proto <- read_csv(proto_fname, col_types=runsheet_spec) %>% as_tibble()
 
   substitutions <- read_csv(rangefile_fname, col_types=rangefile_spec) %>% 
     as_tibble()
@@ -116,30 +127,66 @@ WriteRunSheets <- function(runsheets, prefix="RunSheet_") {
   map2(runsheets, seq(num_sheets), WriteRunSheet)
 }
 
+tryInform <- function(code, message) {
+  handleError <- function(c) {
+    c$message <- paste0(c$message, "\n", '(', message, ')')
+    stop(c)
+  }
+
+  tryCatch(code, error=handleError)
+}
+
+die <- function(message) {
+  write(paste0("Error: ", message), stderr())
+  quit(status=1)
+}
+
 main <- function(args) {
-  n_args <- length(args)
-  n_rangefiles <- n_args - 1
+
+  option_list <- list(
+    make_option(c("-p", "--prior"),
+                action="store_true",
+                default=FALSE,
+                help="Create a collated runsheet from uniform prior distributions"),
+    make_option(c("-r", "--range"),
+                action="store_true",
+                default=FALSE,
+                help="Create a collated runsheet from the cartesian product of sequences"),
+    make_option(c("-n", "--num-samples"),
+                action="store",
+                default=0,
+                help="(-p only) Number of samples from joint prior")
+  )
   
-  offset <- 0
-  collate <- FALSE
-  
-  if (n_args < 2) {
-    print("Usage: PROTOTYPE_FILE RANGEFILE")
-    return();
-  }
-  
-  if (args[1] == "-c") {
-    collate <- TRUE
-    offset <- offset + 1
-  }
-  
-  proto_fname <- args[offset + 1]
-  rangefile_fname <- args[offset + 2]
+  usage <- "%prog [options] PROTOTYPE_FILE RANGEFILE/PRIORFILE"
+  description <- "Creates runsheets from either rangefiles or priorfiles"
+
+  parser <- OptionParser(option_list=option_list,
+                         usage=usage,
+                         prog="./gen_runsheets.R",
+                         description=description)
+
+  opts <- parse_args(parser, args=args, positional_arguments=TRUE)$options
+  args <- parse_args(parser, args=args, positional_arguments=TRUE)$args
+
+  if (opts$prior & opts$range)
+    die("Can't specify prior and range at the same time")
+
+  if (! (opts$prior || opts$range))
+    die("Must specifiy either -p or -rn")
+
+  if (opts$prior && !opts$`num-samples`)
+    die("When using -p, must specificy number of samples")
+
+  print(opts)
+  proto_fname     <- args[1]
+  rangefile_fname <- args[2]
   
   GenPrefix <- function(rangefile_fname) return("")
   
   runsheets <- GenRunSheets(proto_fname, rangefile_fname)
   
+  collate <- TRUE
   if (collate) {
     map(runsheets, ~toJSON(., na='null')) %>% 
       paste(collapse="\n") %>% 
@@ -155,27 +202,3 @@ main <- function(args) {
 
 main(commandArgs(trailingOnly=TRUE))
 
-# For each generated RunSheet, create a list of the parameters in that RunSheet
-# that were in the set of parameters that the rangefile designated as variable
-InspectNewRunSheets <- function(NewRunSheets, rangefile_fname) {
-  substitutions <- read_csv(rangefile_fname, col_types=datasheet_spec) %>% as_tibble()
-  
-  map(NewRunSheets, ~.[which(.$`short-name` %in% substitutions$name), 
-                       c('short-name', 'parameter-1')])
-}
-
-# Given a list of new RunSheets, and the filename of the rangefile
-# that generated them, create a line graph of all of the parameters that
-# are being varied, where X is the name of the parameter being varied, and
-# Y is its value in each of the RunSheetss
-PlotNewRunSheets <- function(new_runsheets, rangefile_fname) {
-  all_sheets <- InspectNewRunSheets(new_runsheets, rangefile_fname) %>%
-    bind_rows(.id="group")
-  
-  ggplot(all_sheets, aes(`short-name`, 
-                         `parameter-1`, 
-                         group=group, 
-                         color=group)) + 
-    geom_line() +
-    geom_point()
-}
