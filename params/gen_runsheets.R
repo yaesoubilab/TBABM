@@ -114,8 +114,8 @@ GenRunSheet <- function(substitutions, new_runsheet) {
     row <- which(runsheet$`short-name` == name)
     column <- 'parameter-1'
     
-    new_runsheet[row, column] <- substitutions[[name]]
-    new_runsheet
+    runsheet[row, column] <- substitutions[[name]]
+    runsheet
   }
   
   reduce(names(substitutions), slotter, .init=new_runsheet)
@@ -136,7 +136,7 @@ GenRunSheets_rf <- function(proto_fname, rangefile_fname) {
   # now, are what 'parameter-1' should be set to.
   crossed <- GenCombinations(substitutions)
   
-  map(crossed, GenRunsheet, proto)
+  map(crossed, GenRunSheet, proto)
 }
 
 GenRunSheets_pf <- function(proto_fname, priorfile_fname, n) {
