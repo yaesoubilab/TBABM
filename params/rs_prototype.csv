@@ -26,9 +26,9 @@ HIV mortality rate - m,HIV_m,v,Constant,(value),0.9,,,,F
 HIV mortality rate - p,HIV_p,v,Constant,(value),0.02,,,,F
 HIV prevalence - 1990,HIV_prevalence_1990,f,HIV/prevalence - 1990.json,,,,,,
 Exogenous birth rate,annualBirthRate,v,Constant,(value),0.02,,,,F
-TB - Initial infection probability,TB_p_init_infect,v,Bernoulli,p,0.5,,,,T
-TB - Initial active probability,TB_p_init_active,v,Bernoulli,p,0.15,,,,T
-TB - Global infection constant,TB_risk_global,v,Constant,(value),10,,,,T
+TB - Initial infection probability,TB_p_init_infect,v,Bernoulli,p,0.12,,,,T
+TB - Initial active probability,TB_p_init_active,v,Bernoulli,p,0.05,,,,T
+TB - Global infection constant,TB_risk_global,v,Constant,(value),6,,,,T
 TB - Household infection constant,TB_risk_household,v,Constant,(value),10,,,,T
 TB - Prob of immediate progression,TB_rapidprog_risk,v,Bernoulli,p,0.10,,,,T
 TB - Time to progression,TB_prog_time,v,Exponential,(rate-shift),0.0035,0,,,T
