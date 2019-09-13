@@ -185,7 +185,7 @@ main <- function(args) {
 
   writer <- function(runsheet) {
     json <- toJSON(runsheet)
-    write(paste0(json, "\n"),
+    write(json,
           file="runsheets.json",
           append=TRUE)
   }
