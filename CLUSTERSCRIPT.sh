@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-#SBATCH --partition=general
+#SBATCH --partition=scavenge
 #SBATCH --job-name=TBABM_calibration
 #SBATCH --output=slurm.log
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=750M
+#SBATCH --mem-per-cpu=2000M
 
 # Note: When invoking 'sbatch', you MUST specify --time=MINS and -n TASKS
 
@@ -15,7 +15,7 @@ module load foss/2018b parallel
 module load R miniconda
 
 module use ~/modulefiles
-module load TBABM/0.5.5-alpha4
+module load TBABM/0.5.5-beta1
 
 # Unload any existing environments and load all the R packages we will need,
 # EXCEPT EasyCalibrator, which must be installed on a per-user basis, manually,
@@ -34,7 +34,7 @@ NTASKS=$SLURM_NTASKS # Number of tasks from Slurm
 NTASKS_MODEL=$((SLURM_NTASKS - AUX_TASKS)) # number of tasks left for model
 
 # Name of the archive to be created
-ARCHIVE_NAME="$SLURM_JOB_NAME"'_'"$SLURM_JOB_ID"'.tar.gz'
+ARCHIVE_NAME="$SLURM_JOB_NAME"'_'"$SLURM_JOB_ID"'.tar'
 
 mkdir -p tmpdir || {(>&2 echo 'Creation of tmpdir/ failed'); exit 1;}
 TMPDIR="$(pwd)/tmpdir"
@@ -49,9 +49,9 @@ if [[ NTASKS_MODEL -lt 1 ]]; then
 fi
 
 time RunTBABM -c runsheets.json -i 30000 -t1 -m1 -j $NTASKS_MODEL |
-  CreateArchive "$ARCHIVE_NAME" |
+#   CreateArchive "$ARCHIVE_NAME" |
     tee monitor1.txt |
-  CalibrateTBABM -p 30000 |
+  CalibrateTBABM |
     tee monitor2.txt | 
   DeleteFolders |
   WeightLikelihoodsTBABM |
