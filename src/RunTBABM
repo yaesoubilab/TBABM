@@ -239,8 +239,12 @@ function tbabm_coll () {
   TBABM_OPTS="-t $N_TRAJECTORIES -n $N_INDIVIDUALS -p $PARAMFILE -s $SEED -o $RUNNUM/ -m $N_THREADS -h household_structure.csv"
 
   $srun $TBABM_BIN $TBABM_OPTS > $RUNNUM/stdout.txt 2> $RUNNUM/stderr.txt
+  
+  # Capture the exit status of the trajectory executed
+  EXITSTATUS=$?
 
   echo "$RUNNUM,$SEED"
+  exit $EXITSTATUS
 }
 
 export N_TRAJECTORIES N_INDIVIDUALS N_THREADS srun TBABM_BIN
