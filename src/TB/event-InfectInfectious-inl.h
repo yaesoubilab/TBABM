@@ -35,11 +35,11 @@ TB::InfectInfectious(Time t, Source s, StrainType)
 		data.tbInfectious.Record(ts, +1);
 		data.tbIncidence.Record(ts, +1);
 
-		if (tb_treatment_status != TBTreatmentStatus::None && \
+		if (treatment_experienced && \
 			AgeStatus(ts) >= 15)
 			data.tbTxExperiencedInfectiousAdults.Record(ts, +1);
 
-		if (tb_treatment_status == TBTreatmentStatus::None && \
+		if (!treatment_experienced && \
 			AgeStatus(ts) >= 15)
 			data.tbTxNaiveInfectiousAdults.Record(ts, +1);
 

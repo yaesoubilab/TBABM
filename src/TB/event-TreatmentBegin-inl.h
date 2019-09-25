@@ -38,14 +38,6 @@ TB::TreatmentBegin(Time t)
 			data.tbTreatmentBeginAdultsNaive.Record(ts, +1);
 		else
 			data.tbTreatmentBeginAdultsExperienced.Record(ts, +1);
-		
-		if (tb_treatment_status == TBTreatmentStatus::None && \
-			AgeStatus(ts) >= 15) {
-			data.tbTxExperiencedAdults.Record(ts, +1);
-			data.tbTxExperiencedInfectiousAdults.Record(ts, +1);
-			data.tbTxNaiveAdults.Record(ts, -1);
-			data.tbTxNaiveInfectiousAdults.Record(ts, -1);
-		}
 
 		// Subgroup for HIV+ people
 		if (GetHIVStatus() == HIVStatus::Positive)
@@ -94,8 +86,17 @@ TB::TreatmentMarkExperienced(Time t)
 		if (tb_treatment_status != TBTreatmentStatus::Incomplete)
 			return true;
 
-		if (!treatment_experienced && AgeStatus(ts_) >= 15)
+		if (!treatment_experienced && AgeStatus(ts_) >= 15) {
+			data.tbTxNaiveAdults.Record((int)ts_, -1);
+			data.tbTxNaiveInfectiousAdults.Record((int)ts_, -1);
 			data.tbTxExperiencedAdults.Record((int)ts_, +1);
+
+                        // Because they aren't considered infectious anymore
+			data.tbTxExperiencedInfectiousAdults.Record((int)ts_, 0);
+                }
+
+                if (treatment_experienced && AgeStatus(ts_) >= 15)
+                        data.tbTxExperiencedInfectiousAdults.Record((int)ts_, -1);
 
 		treatment_experienced = true;
 

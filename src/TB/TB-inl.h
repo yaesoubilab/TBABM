@@ -73,7 +73,7 @@ TB::HandleDeath(Time t)
 
     switch(tb_treatment_status) {
         case (TBTreatmentStatus::None):
-            data.tbTxNaiveAdults.Record(t, adult ? -1 : 0); break;
+            break;
 
         case (TBTreatmentStatus::Incomplete):
             data.tbInTreatment.Record(t, -1); break;
@@ -89,14 +89,16 @@ TB::HandleDeath(Time t)
 
     if (treatment_experienced && adult)
         data.tbTxExperiencedAdults.Record(t, -1);
+    if (!treatment_experienced && adult)
+        data.tbTxNaiveAdults.Record(t, -1);
 
-    if (tb_status           == TBStatus::Infectious && \
-        tb_treatment_status == TBTreatmentStatus::None && \
+    if (tb_status == TBStatus::Infectious && \
+        !treatment_experienced && \
         adult)
         data.tbTxNaiveInfectiousAdults.Record(t, -1);
 
-    if (tb_status           == TBStatus::Infectious && \
-        tb_treatment_status != TBTreatmentStatus::None && \
+    if (tb_status == TBStatus::Infectious && \
+        treatment_experienced && \
         adult)
         data.tbTxExperiencedInfectiousAdults.Record(t, -1);
 
@@ -143,11 +145,11 @@ void TB::EnterAdulthood(void)
             data.tbTxNaiveAdults.Record(ts, +1);
 
         if (tb_status           == TBStatus::Infectious && \
-            tb_treatment_status != TBTreatmentStatus::None)
+            treatment_experienced) 
             data.tbTxExperiencedInfectiousAdults.Record(ts, +1);
 
         if (tb_status           == TBStatus::Infectious && \
-            tb_treatment_status == TBTreatmentStatus::None)
+            !treatment_experienced) 
             data.tbTxNaiveInfectiousAdults.Record(ts, +1);
 
         return true;
