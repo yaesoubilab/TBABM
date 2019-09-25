@@ -17,17 +17,17 @@ using namespace StatisticalDistributions;
 
 EventFunc TBABM::UpdateHouseholds(void)
 {
-	EventFunc ef = 
-		[this] (double t, SchedulerT scheduler) {
-			for (auto it = households.begin(); it != households.end(); it++) {
-				if (!it->second)
-					continue;
+  EventFunc ef = 
+    [this] (double t, SchedulerT scheduler) {
+      for (auto it = households.begin(); it != households.end(); it++) {
+        if (!it->second)
+          continue;
 
-				data.householdsCount.Record(t, +1);
-			}
-			Schedule(t + 365, UpdateHouseholds());
-			return true;
-		};
+        data.householdsCount.Record(t, +1);
+      }
+      Schedule(t + 365, UpdateHouseholds());
+      return true;
+    };
 
-	return ef;
+  return ef;
 }

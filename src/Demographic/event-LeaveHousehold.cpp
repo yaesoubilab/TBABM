@@ -13,22 +13,22 @@ using SchedulerT = EventQueue<double,bool>::SchedulerT;
 // Algorithm S11: Leave current household to form new household
 EventFunc TBABM::LeaveHousehold(weak_p<Individual> idv_w)
 {
-	EventFunc ef = 
-		[this, idv_w](double t, SchedulerT scheduler) {
-			// printf("[%d] LeaveHousehold: %ld::%lu\n", (int)t, idv->householdID, std::hash<Pointer<Individual>>()(idv));
-			auto idv = idv_w.lock();
-			if (!idv)
-				return true;
-			if (idv->dead)
-				return true;
-			
-			Schedule(t, CreateHousehold(idv_w, \
-										weak_p<Individual>{}, \
-										{},\
-										{}));
+  EventFunc ef = 
+    [this, idv_w](double t, SchedulerT scheduler) {
+      // printf("[%d] LeaveHousehold: %ld::%lu\n", (int)t, idv->householdID, std::hash<Pointer<Individual>>()(idv));
+      auto idv = idv_w.lock();
+      if (!idv)
+        return true;
+      if (idv->dead)
+        return true;
 
-			return true;
-		};
+      Schedule(t, CreateHousehold(idv_w, \
+            weak_p<Individual>{}, \
+            {},\
+            {}));
 
-	return ef;
+      return true;
+    };
+
+  return ef;
 }

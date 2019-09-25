@@ -5,105 +5,105 @@
 // out. Schedules either event.
 // For the purposes of surveillance, etc.. this is 
 // also considered diagnosis right now
-void
+  void
 TB::TreatmentBegin(Time t)
 {
-	auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
-		
-		assert(lifetm);
-		assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
+  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
 
-		auto ts = static_cast<int>(ts_);
+    assert(lifetm);
+    assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
 
-		if (!AliveStatus())
-			return true;
+    auto ts = static_cast<int>(ts_);
 
-		if (tb_status != TBStatus::Infectious) {
-			printf("Error: Cannot begin treatment for non-infectious TB\n");
-			return true;
-		}
+    if (!AliveStatus())
+      return true;
 
-		// Log(ts, "TB treatment begin");
+    if (tb_status != TBStatus::Infectious) {
+      printf("Error: Cannot begin treatment for non-infectious TB\n");
+      return true;
+    }
 
-		auto prev_household = ContactHouseholdTBPrevalence(tb_status);
+    // Log(ts, "TB treatment begin");
 
-		data.tbInTreatment.Record(ts, +1);
-		data.tbTreatmentBegin.Record(ts, +1);
+    auto prev_household = ContactHouseholdTBPrevalence(tb_status);
 
-		// Subgroups of treatmentBegin for children, treatment-naive adults,
-		// treatment-experienced adults
-		if (AgeStatus(ts) < 15)
-			data.tbTreatmentBeginChildren.Record(ts, +1);
-		else if (tb_treatment_status == TBTreatmentStatus::None)
-			data.tbTreatmentBeginAdultsNaive.Record(ts, +1);
-		else
-			data.tbTreatmentBeginAdultsExperienced.Record(ts, +1);
+    data.tbInTreatment.Record(ts, +1);
+    data.tbTreatmentBegin.Record(ts, +1);
 
-		// Subgroup for HIV+ people
-		if (GetHIVStatus() == HIVStatus::Positive)
-			data.tbTreatmentBeginHIV.Record(ts, +1);
+    // Subgroups of treatmentBegin for children, treatment-naive adults,
+    // treatment-experienced adults
+    if (AgeStatus(ts) < 15)
+      data.tbTreatmentBeginChildren.Record(ts, +1);
+    else if (tb_treatment_status == TBTreatmentStatus::None)
+      data.tbTreatmentBeginAdultsNaive.Record(ts, +1);
+    else
+      data.tbTreatmentBeginAdultsExperienced.Record(ts, +1);
 
-		if (tb_treatment_status == TBTreatmentStatus::Dropout)
-			data.tbDroppedTreatment.Record(ts, -1);
-		else if (tb_treatment_status == TBTreatmentStatus::Complete)
-			data.tbCompletedTreatment.Record(ts, -1);
+    // Subgroup for HIV+ people
+    if (GetHIVStatus() == HIVStatus::Positive)
+      data.tbTreatmentBeginHIV.Record(ts, +1);
 
-		data.activeHouseholdContacts.Record(prev_household);
+    if (tb_treatment_status == TBTreatmentStatus::Dropout)
+      data.tbDroppedTreatment.Record(ts, -1);
+    else if (tb_treatment_status == TBTreatmentStatus::Complete)
+      data.tbCompletedTreatment.Record(ts, -1);
 
-		tb_treatment_status = TBTreatmentStatus::Incomplete;
+    data.activeHouseholdContacts.Record(prev_household);
 
-		if (RecoveryHandler)
-			RecoveryHandler(ts);
+    tb_treatment_status = TBTreatmentStatus::Incomplete;
 
-		// Will they complete treatment? Assume 100% yes
-		if (params["TB_p_Tx_cmp"].Sample(rng))
-			TreatmentComplete(ts + 365*params["TB_t_Tx_cmp"].Sample(rng));
-		else
-			TreatmentDropout(ts + 365*params["TB_t_Tx_drop"].Sample(rng));
+    if (RecoveryHandler)
+      RecoveryHandler(ts);
 
-		// Schedule the moment where they will be marked as "treatment-experienced."
-		// Right now, this is 1 month after treatment start
-		TreatmentMarkExperienced(ts + 1*30);
+    // Will they complete treatment? Assume 100% yes
+    if (params["TB_p_Tx_cmp"].Sample(rng))
+      TreatmentComplete(ts + 365*params["TB_t_Tx_cmp"].Sample(rng));
+    else
+      TreatmentDropout(ts + 365*params["TB_t_Tx_drop"].Sample(rng));
 
-		return true;
-	};
+    // Schedule the moment where they will be marked as "treatment-experienced."
+    // Right now, this is 1 month after treatment start
+    TreatmentMarkExperienced(ts + 1*30);
 
-	eq.QuickSchedule(t, lambda);
+    return true;
+  };
 
-	return;
+  eq.QuickSchedule(t, lambda);
+
+  return;
 }
 
-void
+  void
 TB::TreatmentMarkExperienced(Time t)
 {
-	auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
+  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
 
-		assert(lifetm);
+    assert(lifetm);
 
-		if (!AliveStatus())
-			return true;
+    if (!AliveStatus())
+      return true;
 
-		if (tb_treatment_status != TBTreatmentStatus::Incomplete)
-			return true;
+    if (tb_treatment_status != TBTreatmentStatus::Incomplete)
+      return true;
 
-		if (!treatment_experienced && AgeStatus(ts_) >= 15) {
-			data.tbTxNaiveAdults.Record((int)ts_, -1);
-			data.tbTxNaiveInfectiousAdults.Record((int)ts_, -1);
-			data.tbTxExperiencedAdults.Record((int)ts_, +1);
+    if (!treatment_experienced && AgeStatus(ts_) >= 15) {
+      data.tbTxNaiveAdults.Record((int)ts_, -1);
+      data.tbTxNaiveInfectiousAdults.Record((int)ts_, -1);
+      data.tbTxExperiencedAdults.Record((int)ts_, +1);
 
-                        // Because they aren't considered infectious anymore
-			data.tbTxExperiencedInfectiousAdults.Record((int)ts_, 0);
-                }
+      // Because they aren't considered infectious anymore
+      data.tbTxExperiencedInfectiousAdults.Record((int)ts_, 0);
+    }
 
-                if (treatment_experienced && AgeStatus(ts_) >= 15)
-                        data.tbTxExperiencedInfectiousAdults.Record((int)ts_, -1);
+    if (treatment_experienced && AgeStatus(ts_) >= 15)
+      data.tbTxExperiencedInfectiousAdults.Record((int)ts_, -1);
 
-		treatment_experienced = true;
+    treatment_experienced = true;
 
-		return true;
-	};
+    return true;
+  };
 
-	eq.QuickSchedule(t, lambda);
+  eq.QuickSchedule(t, lambda);
 
-	return;
+  return;
 }

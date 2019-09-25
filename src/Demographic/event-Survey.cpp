@@ -7,94 +7,94 @@ using SchedulerT = EventQueue<double,bool>::SchedulerT;
 
 EventFunc TBABM::Survey(void)
 {
-	using MS  = MarriageStatus;
-	
-	EventFunc ef = 
-		[this] (double t, SchedulerT scheduler) {
-			string buf;
-			string s = ",";
+  using MS  = MarriageStatus;
 
-			printf("[%5d] Survey\n", (int)t);
+  EventFunc ef = 
+    [this] (double t, SchedulerT scheduler) {
+      string buf;
+      string s = ",";
 
-			///////////////////////////////////////////////////////
-			// Population survey
-			///////////////////////////////////////////////////////
-			for (auto it = population.begin(); it!= population.end(); it++) {
-				auto idv = *it;
+      printf("[%5d] Survey\n", (int)t);
 
-				if (!idv || idv->dead)
-					continue;
+      ///////////////////////////////////////////////////////
+      // Population survey
+      ///////////////////////////////////////////////////////
+      for (auto it = population.begin(); it!= population.end(); it++) {
+        auto idv = *it;
 
-				auto hh = households[idv->householdID];
+        if (!idv || idv->dead)
+          continue;
 
-				if (!hh || hh->size() == 0) continue;
+        auto hh = households[idv->householdID];
 
-				string line = to_string(seed) + s
-							+ to_string(t) + s
-							+ Ihash(idv) + s
-							+ age(idv, t) + s
-							+ sex(idv) + s
-							+ marital(idv) + s
-							+ to_string(households[idv->householdID]->size()) + s
-							+ Hhash(hh) + s
-							+ numChildren(idv) + s
-							+ mom(idv) + s
-							+ dad(idv) + s
-							+ HIV(idv) + s
-							+ ART(idv) + s
-							+ CD4(idv, t, params["HIV_m_30"].Sample(rng)) + s
-							+ TBStatus(idv, t)
-							+ "\n";
+        if (!hh || hh->size() == 0) continue;
 
-				buf += line;
-			}
+        string line = to_string(seed) + s
+          + to_string(t) + s
+          + Ihash(idv) + s
+          + age(idv, t) + s
+          + sex(idv) + s
+          + marital(idv) + s
+          + to_string(households[idv->householdID]->size()) + s
+          + Hhash(hh) + s
+          + numChildren(idv) + s
+          + mom(idv) + s
+          + dad(idv) + s
+          + HIV(idv) + s
+          + ART(idv) + s
+          + CD4(idv, t, params["HIV_m_30"].Sample(rng)) + s
+          + TBStatus(idv, t)
+          + "\n";
 
-			populationSurvey += buf;
-			buf.clear();
+        buf += line;
+      }
 
-			///////////////////////////////////////////////////////
-			// Household survey
-			///////////////////////////////////////////////////////
-			for (auto it = households.begin(); it != households.end(); it++) {
-				auto hh = it->second;
+      populationSurvey += buf;
+      buf.clear();
 
-				if (!hh || hh->size() == 0) continue;
+      ///////////////////////////////////////////////////////
+      // Household survey
+      ///////////////////////////////////////////////////////
+      for (auto it = households.begin(); it != households.end(); it++) {
+        auto hh = it->second;
 
-				auto head =   hh->head;
-				auto spouse = hh->spouse;
+        if (!hh || hh->size() == 0) continue;
 
-				int directOffspring {0};
-				int otherOffspring  {0};
+        auto head =   hh->head;
+        auto spouse = hh->spouse;
 
-				for (auto i : hh->offspring)
-					if (i->father.lock() == head || i->mother.lock() == head || \
-						i->father.lock() == spouse || i->mother.lock() == spouse)
-						directOffspring += 1;
-					else
-						otherOffspring += 1;
+        int directOffspring {0};
+        int otherOffspring  {0};
 
-				string line = to_string(seed) 		      + s \
-							+ to_string(t)    		      + s \
-							+ Hhash(hh)		  		      + s \
-							+ to_string(hh->size())       + s \
-							+ to_string(!!hh->head)       + s \
-							+ to_string(!!hh->spouse)     + s \
-							+ to_string(directOffspring)  + s \
-							+ to_string(otherOffspring)   + s \
-							+ to_string(hh->other.size())     \
-							+ "\n";
+        for (auto i : hh->offspring)
+          if (i->father.lock() == head || i->mother.lock() == head || \
+              i->father.lock() == spouse || i->mother.lock() == spouse)
+            directOffspring += 1;
+          else
+            otherOffspring += 1;
 
-				buf += line;
-			}
+        string line = to_string(seed) 		      + s \
+                      + to_string(t)    		      + s \
+                      + Hhash(hh)		  		      + s \
+                      + to_string(hh->size())       + s \
+                      + to_string(!!hh->head)       + s \
+                      + to_string(!!hh->spouse)     + s \
+                      + to_string(directOffspring)  + s \
+                      + to_string(otherOffspring)   + s \
+                      + to_string(hh->other.size())     \
+                      + "\n";
 
-			householdSurvey += buf;
+        buf += line;
+      }
 
-			Schedule(t + 15*365, Survey());
+      householdSurvey += buf;
 
-			return true;
-		};
+      Schedule(t + 15*365, Survey());
 
-	return ef;
+      return true;
+    };
+
+  return ef;
 }
 
 // data interested in:
