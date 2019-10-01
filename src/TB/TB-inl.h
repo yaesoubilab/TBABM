@@ -3,7 +3,7 @@
 #include "../../include/TBABM/TB.h"
 #include "../../include/TBABM/utils/termcolor.h"
 
-  void
+void
 TB::Log(Time t, string msg)
 {
   std::cout << termcolor::on_green << "[" << std::left \
@@ -12,14 +12,19 @@ TB::Log(Time t, string msg)
     << msg << termcolor::reset << std::endl;
 }
 
-  TBStatus
+TBStatus
 TB::GetTBStatus(Time t)
 {
   return tb_status;
 }
 
+bool
+TB::PreviouslyTreated(void) {
+  return (tb_treatment_status != TBTreatmentStatus::None) && \
+         (tb_treatment_status != TBTreatmentStatus::Incomplete);
+}
 
-  void
+void
 TB::SetHouseholdCallbacks(function<void(Time)>       progression, 
     function<void(Time)>       recovery,
     function<double(void)>     householdPrevalence,
@@ -36,7 +41,7 @@ TB::SetHouseholdCallbacks(function<void(Time)>       progression,
   ContactHouseholdTBPrevalence = contactHouseholdPrevalence;
 }
 
-  void
+void
 TB::ResetHouseholdCallbacks(void)
 {
   ProgressionHandler    = nullptr;
@@ -44,7 +49,7 @@ TB::ResetHouseholdCallbacks(void)
   HouseholdTBPrevalence = nullptr;
 }
 
-  void
+void
 TB::HandleDeath(Time t)
 {
   bool adult = AgeStatus(t) >= 15;
@@ -105,7 +110,7 @@ TB::HandleDeath(Time t)
   return;
 }
 
-  void
+void
 TB::InitialEvents(void)
 {
   InfectionRiskEvaluate_initial();

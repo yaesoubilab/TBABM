@@ -87,15 +87,19 @@ typedef struct TBQueryHandlers {
   function<bool(void)> Alive;
   function<double(Time)> CD4Count;
   function<HIVStatus(void)> GetHIVStatus;
+  function<bool(void)> ART;
   function<double(Time)> GlobalTBPrevalence;
   function<shared_p<TB>(void)> Lifetime;
 } TBQueryHandlers;
 
-TBQueryHandlers CreateTBQueryHandlers(function<int(Time)> Age,
-    function<bool(void)> Alive,
-    function<double(Time)> CD4Count,
-    function<HIVStatus(void)> HIVStatus,
-    function<double(Time)> GlobalTBPrevalence,
-    function<shared_p<TB>(void)> Lifetime);
+TBQueryHandlers CreateTBQueryHandlers(
+  function<int(Time)> Age,
+  function<bool(void)> Alive,
+  function<double(Time)> CD4Count,
+  function<HIVStatus(void)> HIVStatus,
+  function<bool(void)> ART,
+  function<double(Time)> GlobalTBPrevalence,
+  function<shared_p<TB>(void)> Lifetime
+);
 
 typedef IndividualSimContext TBSimContext; // For right now these are the same

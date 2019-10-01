@@ -46,6 +46,7 @@ class TB
       AliveStatus(initQueryHandlers.Alive),
       CD4Count(initQueryHandlers.CD4Count),
       GetHIVStatus(initQueryHandlers.GetHIVStatus),
+      ARTStatus(initQueryHandlers.ART),
       GlobalTBPrevalence(initQueryHandlers.GlobalTBPrevalence),
 
       name(name),
@@ -72,6 +73,7 @@ class TB
       }
 
     TBStatus GetTBStatus(Time);
+    bool PreviouslyTreated(void);
 
     void SetHouseholdCallbacks(function<void(Time)> progression, 
         function<void(Time)> recovery,
@@ -162,6 +164,7 @@ class TB
     function<Alive(void)> AliveStatus;
     function<CD4(Time)> CD4Count;
     function<HIVStatus(void)> GetHIVStatus;
+    function<bool(void)> ARTStatus;
     function<double(Time)> GlobalTBPrevalence;
     function<double(void)> HouseholdTBPrevalence;
     function<double(TBStatus)> ContactHouseholdTBPrevalence;
