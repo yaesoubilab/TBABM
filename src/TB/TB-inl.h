@@ -18,6 +18,16 @@ TB::GetTBStatus(Time t)
   return tb_status;
 }
 
+  TB::HIVType
+TB::GetHIVType(Time t)
+{
+  if (GetHIVStatus() == HIVStatus::Negative)
+    return HIVType::Neg;
+  else if (ARTStatus() || CD4Count(t) > 100)
+    return HIVType::Good;
+  else
+    return HIVType::Bad;
+}
 
   void
 TB::SetHouseholdCallbacks(function<void(Time)>       progression, 

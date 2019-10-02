@@ -30,6 +30,7 @@ class TB
     using Year        = int;
     using CD4         = double;
     using HouseholdTB = bool;
+    using HIVType     = enum class HIVType { Neg, Good, Bad };
 
     TB(TBData initData,
         TBSimContext initCtx,
@@ -93,6 +94,10 @@ class TB
 
     void Log(Time, string);
 
+    //////////////////////////////////////////////////////////////////////////
+    // Event functions
+    //////////////////////////////////////////////////////////////////////////
+
     // Evaluates the risk of infection according to age,
     // sex, year, CD4 count, and household TB presence.
     // May schedule TB infection.
@@ -137,7 +142,17 @@ class TB
     // status tb_status to Latent
     void Recovery(Time, RecoveryType);
 
+    //////////////////////////////////////////////////////////////////////////
+    // Helper functions
+    //////////////////////////////////////////////////////////////////////////
+
     void EnterAdulthood(void);
+
+    HIVType GetHIVType(Time t);
+
+    //////////////////////////////////////////////////////////////////////////
+    // Member variables
+    //////////////////////////////////////////////////////////////////////////
 
     double risk_window; // unit: [days]
     int risk_window_id;
@@ -160,6 +175,10 @@ class TB
 
     TBData data;
 
+    //////////////////////////////////////////////////////////////////////////
+    // Query functions
+    //////////////////////////////////////////////////////////////////////////
+
     function<Age(Time)> AgeStatus;
     function<Alive(void)> AliveStatus;
     function<CD4(Time)> CD4Count;
@@ -170,6 +189,10 @@ class TB
     function<double(TBStatus)> ContactHouseholdTBPrevalence;
 
     function<shared_p<TB>(void)> GetLifetimePtr;
+
+    //////////////////////////////////////////////////////////////////////////
+    // Event handler functions
+    //////////////////////////////////////////////////////////////////////////
 
     function<void(Time)> DeathHandler;   
     function<void(Time)> ProgressionHandler;
