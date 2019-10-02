@@ -4,7 +4,7 @@
 // schedule the beginning of treatment.
 // 
 // If no treatment, recovery or death is scheduled.
-  void
+void
 TB::InfectInfectious(Time t, Source s, StrainType)
 {
   auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) {
@@ -49,9 +49,28 @@ TB::InfectInfectious(Time t, Source s, StrainType)
     if (ProgressionHandler)
       ProgressionHandler(ts);
 
+    Param t_seek_tx;
+    HIVType hiv_cat = GetHIVType(ts);
+    
+    if (treatment_experienced) {
+      if (hiv_cat == HIVType::Neg)
+        t_seek_tx = params["TB_t_seek_tx_pt"];
+      else if (hiv_cat == HIVType::Good)
+        t_seek_tx = params["TB_t_seek_tx_pt_goodHIV"];
+      else
+        t_seek_tx = params["TB_t_seek_tx_pt_badHIV"];
+    } else {
+      if (hiv_cat == HIVType::Neg)
+        t_seek_tx = params["TB_t_seek_tx"];
+      else if (hiv_cat == HIVType::Good)
+        t_seek_tx = params["TB_t_seek_tx_goodHIV"];
+      else
+        t_seek_tx = params["TB_t_seek_tx_badHIV"];
+    }
+
     auto timeToNaturalRecovery	= params["TB_t_recov"].Sample(rng);
-    auto timeToDeath			= params["TB_t_death"].Sample(rng);
-    auto timeToSeekingTreatment = params["TB_t_seek_tx"].Sample(rng);
+    auto timeToDeath            = params["TB_t_death"].Sample(rng);
+    auto timeToSeekingTreatment = t_seek_tx.Sample(rng);
 
     auto winner =
       std::min({timeToNaturalRecovery,

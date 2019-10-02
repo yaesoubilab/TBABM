@@ -69,13 +69,16 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
 
     // Will they become latently infected, or progress rapidly?
     // Individuals who are latently infected CANNOT become latently infected
-    // again; from this sampling they are only vulnerable to rapid progression
-    auto risk = params["TB_rapidprog_risk"];
+    // again; after this sampling they are only vulnerable to rapid progression
+    HIVType hiv_cat = GetHIVType(t);
 
-    if ((GetHIVStatus() == HIVStatus::Positive && CD4Count(t) > 100) ||
-        ARTStatus())
+    Param risk;
+
+    if (hiv_cat == HIVType::Neg)
+      risk = params["TB_rapidprog_risk"];
+    else if (hiv_cat == HIVType::Good)
       risk = params["TB_rapidprog_risk_goodHIV"];
-    else if (GetHIVStatus() == HIVStatus::Positive)
+    else
       risk = params["TB_rapidprog_risk_badHIV"];
 
     if (risk.Sample(rng) || init_active)
