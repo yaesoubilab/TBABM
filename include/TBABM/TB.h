@@ -46,6 +46,7 @@ class TB
       AliveStatus(initQueryHandlers.Alive),
       CD4Count(initQueryHandlers.CD4Count),
       GetHIVStatus(initQueryHandlers.GetHIVStatus),
+      ARTStatus(initQueryHandlers.ART),
       GlobalTBPrevalence(initQueryHandlers.GlobalTBPrevalence),
 
       name(name),
@@ -72,6 +73,7 @@ class TB
       }
 
     TBStatus GetTBStatus(Time);
+    bool PreviouslyTreated(void);
 
     void SetHouseholdCallbacks(function<void(Time)> progression, 
         function<void(Time)> recovery,
@@ -90,10 +92,6 @@ class TB
   private:
 
     void Log(Time, string);
-
-    //////////////////////////////////////////////////////////////////////////
-    // Event functions
-    //////////////////////////////////////////////////////////////////////////
 
     // Evaluates the risk of infection according to age,
     // sex, year, CD4 count, and household TB presence.
@@ -139,16 +137,7 @@ class TB
     // status tb_status to Latent
     void Recovery(Time, RecoveryType);
 
-
-    //////////////////////////////////////////////////////////////////////////
-    // Helper functions
-    //////////////////////////////////////////////////////////////////////////
-
     void EnterAdulthood(void);
-
-    //////////////////////////////////////////////////////////////////////////
-    // Member variables
-    //////////////////////////////////////////////////////////////////////////
 
     double risk_window; // unit: [days]
     int risk_window_id;
@@ -171,22 +160,17 @@ class TB
 
     TBData data;
 
-    //////////////////////////////////////////////////////////////////////////
-    // Query functions
-    //////////////////////////////////////////////////////////////////////////
     function<Age(Time)> AgeStatus;
     function<Alive(void)> AliveStatus;
     function<CD4(Time)> CD4Count;
     function<HIVStatus(void)> GetHIVStatus;
+    function<bool(void)> ARTStatus;
     function<double(Time)> GlobalTBPrevalence;
     function<double(void)> HouseholdTBPrevalence;
     function<double(TBStatus)> ContactHouseholdTBPrevalence;
 
     function<shared_p<TB>(void)> GetLifetimePtr;
 
-    //////////////////////////////////////////////////////////////////////////
-    // Event handlers
-    //////////////////////////////////////////////////////////////////////////
     function<void(Time)> DeathHandler;   
     function<void(Time)> ProgressionHandler;
     function<void(Time)> RecoveryHandler;

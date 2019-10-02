@@ -73,13 +73,27 @@ class Individual : public std::enable_shared_from_this<Individual> {
 
     TBQueryHandlers TBQueryHandlersInit(void) {
       return CreateTBQueryHandlers(
-          [this] (Time t) -> int        { return age(t); },
-          [this] (void) -> bool         { return !dead; },
-          [this] (Time t) -> double     { return CD4count(t, params["HIV_m_30"].Sample(rng)); },
-          [this] (void) -> HIVStatus    { return hivStatus; },
-          [this] (Time t) -> double     { return handles.GlobalTBPrevalence(t); },
-          [this] (void) -> shared_p<TB> { return shared_p<TB>(shared_from_this(), &this->tb); }
-          );
+        // Age
+        [this] (Time t) -> int        { return age(t); },
+
+        // Alive
+        [this] (void) -> bool         { return !dead; },
+
+        // CD4 count
+        [this] (Time t) -> double     { return CD4count(t, params["HIV_m_30"].Sample(rng)); },
+
+        // HIV status
+        [this] (void) -> HIVStatus    { return hivStatus; },
+
+        // ART status
+        [this] (void) -> bool         { return onART; },
+
+        // Global TB prevalence
+        [this] (Time t) -> double     { return handles.GlobalTBPrevalence(t); },
+
+        // Lifetime pointer
+        [this] (void) -> shared_p<TB> { return shared_p<TB>(shared_from_this(), &this->tb); }
+      );
     }
 
     bool dead;
@@ -91,6 +105,12 @@ class Individual : public std::enable_shared_from_this<Individual> {
 
     int numOffspring() {
       return offspring.size();
+    }
+
+    // Shorthand, assumes that "HIV_m_30" is a constant. The second definition
+    // should be eliminated, but first references to it must be changed
+    double CD4count(double t_cur) {
+      return CD4count(t_cur, params["HIV_m_30"].Sample(rng));
     }
 
     double CD4count(double t_cur, double m_30) {
