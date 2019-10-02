@@ -50,26 +50,43 @@ TB::InfectInfectious(Time t, Source s, StrainType)
       ProgressionHandler(ts);
 
     Param t_seek_tx;
+    Param t_death;
+    Param t_recov;
+
     HIVType hiv_cat = GetHIVType(ts);
     
     if (treatment_experienced) {
-      if (hiv_cat == HIVType::Neg)
+      if (hiv_cat == HIVType::Neg) {
         t_seek_tx = params["TB_t_seek_tx_pt"];
-      else if (hiv_cat == HIVType::Good)
+        t_death   = params["TB_t_death"];
+        t_recov   = params["TB_t_recov"];
+      } else if (hiv_cat == HIVType::Good) {
         t_seek_tx = params["TB_t_seek_tx_pt_goodHIV"];
-      else
+        t_death   = params["TB_t_death_goodHIV"];
+        t_recov   = params["TB_t_recov_goodHIV"];
+      } else {
         t_seek_tx = params["TB_t_seek_tx_pt_badHIV"];
+        t_death   = params["TB_t_death_badHIV"];
+        t_recov   = params["TB_t_recov_badHIV"];
+      }
     } else {
-      if (hiv_cat == HIVType::Neg)
+      if (hiv_cat == HIVType::Neg) {
         t_seek_tx = params["TB_t_seek_tx"];
-      else if (hiv_cat == HIVType::Good)
+        t_death   = params["TB_t_death"];
+        t_recov   = params["TB_t_recov"];
+      } else if (hiv_cat == HIVType::Good) {
         t_seek_tx = params["TB_t_seek_tx_goodHIV"];
-      else
+        t_death   = params["TB_t_death_goodHIV"];
+        t_recov   = params["TB_t_recov_goodHIV"];
+      } else {
         t_seek_tx = params["TB_t_seek_tx_badHIV"];
+        t_death   = params["TB_t_death_badHIV"];
+        t_recov   = params["TB_t_recov_badHIV"];
+      }
     }
 
-    auto timeToNaturalRecovery	= params["TB_t_recov"].Sample(rng);
-    auto timeToDeath            = params["TB_t_death"].Sample(rng);
+    auto timeToNaturalRecovery	= t_recov.Sample(rng);
+    auto timeToDeath            = t_death.Sample(rng);
     auto timeToSeekingTreatment = t_seek_tx.Sample(rng);
 
     auto winner =
