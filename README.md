@@ -1,18 +1,20 @@
 ## Installing within SLURM environment
 
-In order to run TBABM on the cluster, you must compile the binaries in a similar environment to the one they will be executed on. First, acquire an interactive allocation with several cores, to speed compile time.
+In order to run TBABM on a SLURM-managed cluster, you must compile the binaries in a similar environment to the one they will be executed on. However, subtle differences in the architecture between the login nodes (the ones you `ssh` into), and the compute nodes, can lead to segmentation faults and odd bugs when running login-compiled code on a compute node. Therefore, starting an interactive session on a compute node and doing the compilation there will lead to better results.
+
+First, acquire an interactive allocation with several cores, to speed compile time.
 
 ```bash
 srun --pty -p interactive --cpus-per-task=8 --time=60 bash
 ```
 
-You should now be inside an interactive job allocation which will allow you to build binaries in the correct environment
+You should now be inside an interactive job allocation, which will allow you to build binaries in an appropriate environment.
 
 ### Installing dependencies
 
-TBABM references a few in-house libraries, **SimulationLib** and **StatisticalDistributionsLib**. They must be installed in a directory that TBABM's build system, **CMake**, can see when you are compiling the TBABM binary.
+TBABM references a few in-house libraries: **SimulationLib** and **StatisticalDistributionsLib**. They must be installed in a directory that TBABM's build system, **CMake**, can see when you are compiling the TBABM binary.
 
-First, we will create a temporary directory to compile all the software, and a `software/` directory to house the compiled binaries and headers. We'll also make a special variable, `$PREFIX`, to remind us of where `software/` is.
+First, we will create a `tmp/` directory to compile all the software, and a `software/` directory to house the compiled binaries and headers. We'll also make a special variable, `$PREFIX`, to remind us of where `software/` is.
 
 ```bash
 mkdir ~/software ~/tmp && cd ~/tmp
