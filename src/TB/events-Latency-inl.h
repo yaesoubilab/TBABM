@@ -48,32 +48,31 @@ TB::InfectLatent(Time t, Source source, StrainType strain)
 
     switch (tb_treatment_status) {
       case TBTreatmentStatus::None:
-        printf("interesting...");
         if (hiv_cat == HIVType::Neg)
-          risk = params["TB_reac_TN"];
+          risk = params.at("TB_reac_TN");
         else if (hiv_cat == HIVType::Good)
-          risk = params["TB_reac_TN_goodHIV"];
+          risk = params.at("TB_reac_TN_goodHIV");
         else
-          risk = params["TB_reac_TN_badHIV"];
+          risk = params.at("TB_reac_TN_badHIV");
         break;
 
       case TBTreatmentStatus::Incomplete:
       case TBTreatmentStatus::Dropout:
         if (hiv_cat == HIVType::Neg)
-          risk = params["TB_reac_TI"];
+          risk = params.at("TB_reac_TI");
         else if (hiv_cat == HIVType::Good)
-          risk = params["TB_reac_TI_goodHIV"];
+          risk = params.at("TB_reac_TI_goodHIV");
         else
-          risk = params["TB_reac_TI_badHIV"];
+          risk = params.at("TB_reac_TI_badHIV");
         break;
 
       case TBTreatmentStatus::Complete:
         if (hiv_cat == HIVType::Neg)
-          risk = params["TB_reac_TC"];
+          risk = params.at("TB_reac_TC");
         else if (hiv_cat == HIVType::Good)
-          risk = params["TB_reac_TC_goodHIV"];
+          risk = params.at("TB_reac_TC_goodHIV");
         else
-          risk = params["TB_reac_TC_badHIV"];
+          risk = params.at("TB_reac_TC_badHIV");
         break;
 
       default:
