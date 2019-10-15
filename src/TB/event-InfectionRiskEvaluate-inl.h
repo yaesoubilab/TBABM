@@ -39,8 +39,27 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
   bool init_infection {false};
   bool init_active    {false};
 
-  long double risk_global     {GlobalTBPrevalence(t) * params["TB_risk_global"].Sample(rng)};
-  long double risk_household  {ContactHouseholdTBPrevalence(tb_status) * params["TB_risk_household"].Sample(rng)};
+  bool previously_treated {tb_treatment_status == TBTreatmentStatus::Complete};
+
+  long double reduction {1};
+
+  HIVType hiv_cat = GetHIVType(t);
+
+  if (previously_treated) {
+    if (hiv_cat == HIVType::Neg)
+      reduction = 1-params["TB_risk_reduction"].Sample(rng);
+    else if (hiv_cat == HIVType::Good)
+      reduction = 1-params["TB_risk_reduction_goodHIV"].Sample(rng);
+    else // badHIV
+      reduction = 1-params["TB_risk_reduction_badHIV"].Sample(rng);
+  }
+   
+  long double risk_global     {reduction * \
+                               GlobalTBPrevalence(t) * \
+                               params["TB_risk_global"].Sample(rng)};
+  long double risk_household  {reduction * \
+                               ContactHouseholdTBPrevalence(tb_status) * \
+                               params["TB_risk_household"].Sample(rng)};
 
   // Time to infection for global and local. If any of these risks are zero,
   // change to a really small number since you can't sample 0-rate exponentials
