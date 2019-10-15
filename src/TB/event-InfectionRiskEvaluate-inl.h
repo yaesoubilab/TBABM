@@ -41,6 +41,8 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
 
   bool previously_treated {tb_treatment_status == TBTreatmentStatus::Complete};
 
+  // The reduction in susceptibility associated with previous successful
+  // treatment
   long double reduction {1};
 
   HIVType hiv_cat = GetHIVType(t);
