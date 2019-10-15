@@ -30,6 +30,9 @@ TB - Initial infection probability,TB_p_init_infect,v,Bernoulli,p,0.12,,,,T
 TB - Initial active probability,TB_p_init_active,v,Bernoulli,p,0.05,,,,T
 TB - Global infection constant,TB_risk_global,v,Constant,(value),6,,,,T
 TB - Household infection constant,TB_risk_household,v,Constant,(value),10,,,,T
+TB - Reduction in susceptibility - noHIV,TB_risk_reduction,v,Constant,(value),6,,,,T
+TB - Reduction in susceptibility - goodHIV,TB_risk_reduction_goodHIV,v,Constant,(value),6,,,,T
+TB - Reduction in susceptibility - badHIV,TB_risk_reduction_badHIV,v,Constant,(value),6,,,,T
 TB - P immediate progression - noHIV,TB_rapidprog_risk,v,Bernoulli,p,0.12,,,,T
 TB - P immediate progression - goodHIV,TB_rapidprog_risk_goodHIV,v,Bernoulli,p,0.30,,,,T
 TB - P immediate progression - badHIV,TB_rapidprog_risk_badHIV,v,Bernoulli,p,0.82,,,,T
