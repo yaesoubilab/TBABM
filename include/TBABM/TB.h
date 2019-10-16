@@ -161,18 +161,19 @@ class TB
     // Member variables
     //////////////////////////////////////////////////////////////////////////
 
-    double risk_window; // unit: [days]
-    int risk_window_id;
+    double risk_window; // How many days in between evals for LTB. unit: [days]
+    int risk_window_id; // The "ID" of the window. Incremented on change in
+                        // household prevalence.
 
     TBStatus tb_status;
     TBTreatmentStatus tb_treatment_status;
+
     std::vector<TBHistoryItem> tb_history;
     bool treatment_experienced = false;
 
     // All of these are from the constructor
     string name;
     Sex sex;
-
     EQ& eq;
     RNG& rng;
     map<string, DataFrameFile>& fileData;
@@ -180,7 +181,7 @@ class TB
 
     int init_time;
 
-    TBData data;
+    TBData data; // Where all the references to timeseries data live
 
     //////////////////////////////////////////////////////////////////////////
     // Query functions
