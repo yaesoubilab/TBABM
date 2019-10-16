@@ -39,6 +39,8 @@ class Household {
     double ContactActiveTBPrevalence(TBStatus);
     double ContactActiveTBPrevalence(TBStatus, int t);
 
+    bool ContactTrace(int t, shared_p<Individual> idv);
+
     Household(shared_p<Individual> head,
         shared_p<Individual> spouse,
         std::vector<shared_p<Individual>> offspring,

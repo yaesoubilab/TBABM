@@ -65,6 +65,10 @@ TB::TreatmentBegin(Time t)
     // Right now, this is 1 month after treatment start
     TreatmentMarkExperienced(ts + 1*30);
 
+    // Do a contact trace
+    assert(ContactTraceHandler);
+    ContactTraceHandler(ts);
+
     return true;
   };
 

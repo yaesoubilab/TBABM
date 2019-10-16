@@ -46,8 +46,8 @@ TB::InfectInfectious(Time t, Source s, StrainType)
     // Mark as infectious
     tb_status = TBStatus::Infectious;
 
-    if (ProgressionHandler)
-      ProgressionHandler(ts);
+    assert(ProgressionHandler);
+    ProgressionHandler(ts);
 
     Param t_seek_tx;
     Param t_death;
