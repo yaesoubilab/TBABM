@@ -58,6 +58,41 @@ TB::ResetHouseholdCallbacks(void)
   HouseholdTBPrevalence = nullptr;
 }
 
+// This function is an interface to the death mechanism provided
+// by Individual. It makes sure that the 'flag_contact_trace' has not been
+// put up before scheduling the Individual-level death mechanism.
+void
+TB::InternalDeathHandler(Time t)
+{
+  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
+
+    assert(lifetm);
+
+    if (!AliveStatus())
+      return true;
+
+    auto ts = static_cast<int>(ts_);
+
+    // If this event has been flagged because of a contact-trace, remove the flag
+    // and pretend the event never happened.
+    if (flag_contact_traced) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-death,1\n");
+      return true;
+    }
+    
+    // Otherwise, schedule the death for time 't'.
+    DeathHandler(ts);
+
+    return true;
+  };
+
+  eq.QuickSchedule(t, lambda);
+}
+
+// This function is called by Individual AFTER death is assured to happen.
+// The above function is used to check the contact-tracing flag BEFORE a 
+// death is assured to happen.
   void
 TB::HandleDeath(Time t)
 {

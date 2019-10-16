@@ -9,6 +9,12 @@ TB::Recovery(Time t, RecoveryType r)
     if (!AliveStatus())
       return true;
 
+    if (flag_contact_traced) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-recovery,1\n");
+      return true;
+    }
+
     // Log(ts, string("TB recovery: ") + (r == RecoveryType::Natural ? "natural" : "treatment"));
 
     data.tbRecoveries.Record((int)ts, +1);

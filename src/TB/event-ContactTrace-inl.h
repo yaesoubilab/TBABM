@@ -4,11 +4,15 @@ int
 TB::ContactTrace(Time t)
 {
   if (!AliveStatus())
-    return true;
+    return 0;
+  
+  if (tb_status != TBStatus::Infectious ||
+      tb_treatment_status == TBTreatmentStatus::Incomplete)
+    return 0;
 
-  if (tb_status == TBStatus::Infectious &&
-      tb_treatment_status != TBTreatmentStatus::Incomplete)
-    return 1;
+  flag_contact_traced = true;
 
-  return 0;
+  TreatmentBegin(t); // Individual immediately begins treatment
+
+  return 1;
 }

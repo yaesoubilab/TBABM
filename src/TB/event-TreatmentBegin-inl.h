@@ -23,6 +23,12 @@ TB::TreatmentBegin(Time t)
       return true;
     }
 
+    if (flag_contact_traced) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-treatment,1\n");
+      return true;
+    }
+
     // Log(ts, "TB treatment begin");
 
     auto prev_household = ContactHouseholdTBPrevalence(tb_status);
@@ -65,10 +71,12 @@ TB::TreatmentBegin(Time t)
     // Right now, this is 1 month after treatment start
     TreatmentMarkExperienced(ts + 1*30);
 
-    // Do a contact trace
-    assert(ContactTraceHandler);
-    int cases_found = ContactTraceHandler(ts);
-    printf("ctrace,%d\n", cases_found);
+    if (false && ts > 365*20) {
+      // Do a contact trace
+      assert(ContactTraceHandler);
+      int cases_found = ContactTraceHandler(ts);
+      // printf("ctrace,%d\n", cases_found);
+    }
 
     return true;
   };

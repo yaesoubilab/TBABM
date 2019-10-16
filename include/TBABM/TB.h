@@ -149,6 +149,8 @@ class TB
     // status tb_status to Latent
     void Recovery(Time, RecoveryType);
 
+    void InternalDeathHandler(Time);
+
     //////////////////////////////////////////////////////////////////////////
     // Helper functions
     //////////////////////////////////////////////////////////////////////////
@@ -158,8 +160,13 @@ class TB
     HIVType GetHIVType(Time t);
 
     //////////////////////////////////////////////////////////////////////////
-    // Member variables
+    // Private member variables
     //////////////////////////////////////////////////////////////////////////
+
+    // Used to invalidate any queued events scheduled by InfectInfectious in
+    // the event that the individual's active TB is identified during a
+    // contact trace.
+    bool flag_contact_traced = false;
 
     double risk_window; // How many days in between evals for LTB. unit: [days]
     int risk_window_id; // The "ID" of the window. Incremented on change in

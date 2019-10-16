@@ -100,7 +100,7 @@ TB::InfectInfectious(Time t, Source s, StrainType)
 
     // Individual dies from infection
     else if (winner == timeToDeath)
-      DeathHandler(ts + 365*timeToDeath);
+      InternalDeathHandler(ts + 365*timeToDeath);
 
     // Individual seeks out treatment
     else if (winner == timeToSeekingTreatment)
