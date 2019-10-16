@@ -67,7 +67,8 @@ TB::TreatmentBegin(Time t)
 
     // Do a contact trace
     assert(ContactTraceHandler);
-    ContactTraceHandler(ts);
+    int cases_found = ContactTraceHandler(ts);
+    printf("ctrace,%d\n", cases_found);
 
     return true;
   };

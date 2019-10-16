@@ -39,7 +39,10 @@ class Household {
     double ContactActiveTBPrevalence(TBStatus);
     double ContactActiveTBPrevalence(TBStatus, int t);
 
-    bool ContactTrace(int t, shared_p<Individual> idv);
+    // Do a contact trace on the household. Returns the number of cases
+    // of active, untreated TB in the household (NOT including the 
+    // individual causing the tracing event to occur)
+    int ContactTrace(int t, shared_p<Individual> idv);
 
     Household(shared_p<Individual> head,
         shared_p<Individual> spouse,

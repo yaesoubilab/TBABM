@@ -76,7 +76,7 @@ class TB
     TBStatus GetTBStatus(Time);
     bool PreviouslyTreated(void);
 
-    void SetHouseholdCallbacks(function<void(Time)> contactTrace,
+    void SetHouseholdCallbacks(function<int(Time)> contactTrace,
         function<void(Time)> progression, 
         function<void(Time)> recovery,
         function<double(void)> householdPrevalence,
@@ -91,7 +91,7 @@ class TB
     // infectious, then start them on treatment, and "cancel" any of the
     // following events that may have been scheduled: Death, Recovery,
     // TreatmentBegin
-    void ContactTrace(Time);
+    int ContactTrace(Time);
 
     // Called by containing Individual upon death, neccessary
     // to update TimeSeries data.
@@ -203,6 +203,6 @@ class TB
 
     function<void(Time)> DeathHandler;   
     function<void(Time)> ProgressionHandler;
-    function<void(Time)> ContactTraceHandler;
+    function<int(Time)>  ContactTraceHandler;
     function<void(Time)> RecoveryHandler;
 };

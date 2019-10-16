@@ -62,7 +62,7 @@ void Household::AddIndividual(shared_p<Individual> idv, int t, HouseholdPosition
     nInfectiousTBIndivduals += 1;
 
   idv->tb.SetHouseholdCallbacks(
-    [this, idv] (int t) -> bool   { return ContactTrace(t, idv); },
+    [this, idv] (int t) -> int    { return ContactTrace(t, idv); },
 
     [this, idv] (int t) -> void   { nInfectiousTBIndivduals += 1;
                                     TriggerReeval(t, idv); },
@@ -217,27 +217,28 @@ double Household::ContactActiveTBPrevalence(TBStatus s, int t) {
   return ContactActiveTBPrevalence(s);
 }
 
-bool Household::ContactTrace(int t, shared_p<Individual> idv) {
-  printf("Beginning a contact trace\n");
+int Household::ContactTrace(int t, shared_p<Individual> idv) {
+
+  int cases_found {0};
 
   if (head && head != idv)
-    head->tb.ContactTrace(t);
+    cases_found += head->tb.ContactTrace(t);
   if (spouse && spouse != idv)
-    spouse->tb.ContactTrace(t);
+    cases_found += spouse->tb.ContactTrace(t);
 
   for (auto it = offspring.begin(); it != offspring.end(); it++) {
     assert(*it);
     if (*it != idv)
-      (*it)->tb.ContactTrace(t);
+      cases_found += (*it)->tb.ContactTrace(t);
   }
 
   for (auto it = other.begin(); it != other.end(); it++) {
     assert(*it);
     if (*it != idv)
-      (*it)->tb.ContactTrace(t);
+      cases_found += (*it)->tb.ContactTrace(t);
   }
 
-  return true;
+  return cases_found;
 }
 
 void Household::TriggerReeval(int t, weak_p<Individual> idv_w) {

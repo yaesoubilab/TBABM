@@ -30,19 +30,20 @@ TB::GetHIVType(Time t)
 }
 
   void
-TB::SetHouseholdCallbacks(function<void(Time)> contactTrace,
+TB::SetHouseholdCallbacks(function<int(Time)> contactTrace,
     function<void(Time)>       progression, 
     function<void(Time)>       recovery,
     function<double(void)>     householdPrevalence,
     function<double(TBStatus)> contactHouseholdPrevalence)
 {
-  assert(progression && 
+  assert(contactTrace &&
+      progression && 
       recovery && 
       householdPrevalence && 
       contactHouseholdPrevalence);
 
-  ProgressionHandler           = progression;
   ContactTraceHandler          = contactTrace;
+  ProgressionHandler           = progression;
   RecoveryHandler              = recovery;
   HouseholdTBPrevalence        = householdPrevalence;
   ContactHouseholdTBPrevalence = contactHouseholdPrevalence;
