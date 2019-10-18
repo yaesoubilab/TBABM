@@ -12,7 +12,7 @@ TB::ContactTrace(Time t)
 
   flag_contact_traced = true;
 
-  TreatmentBegin(t); // Individual immediately begins treatment
+  TreatmentBegin(t, true); // Individual immediately begins treatment
 
   return 1;
 }

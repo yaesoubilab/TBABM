@@ -5,10 +5,14 @@
 // out. Schedules either event.
 // For the purposes of surveillance, etc.. this is 
 // also considered diagnosis right now
+//
+// 'flag_override' prevents a TreatmentBegin event from being cancelled in
+// the event that the ORIGIN of the event was the contact-trace itself.
   void
-TB::TreatmentBegin(Time t)
+TB::TreatmentBegin(Time t, bool flag_override)
 {
-  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
+  auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
+                (auto ts_, auto) -> bool {
 
     assert(lifetm);
     assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
@@ -18,14 +22,20 @@ TB::TreatmentBegin(Time t)
     if (!AliveStatus())
       return true;
 
-    if (tb_status != TBStatus::Infectious) {
-      printf("Error: Cannot begin treatment for non-infectious TB\n");
+    if (flag_contact_traced && !flag_override) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-treatment,1\n");
       return true;
     }
 
-    if (flag_contact_traced) {
-      flag_contact_traced = false;
-      // printf("ctrace-cancel-treatment,1\n");
+    if (flag_contact_traced && flag_override) {
+      // No-op
+    }
+
+    if (tb_status != TBStatus::Infectious) {
+      printf("warn: Can't begin tx for non-infectious TB. Flag was (%d), override was (%d)\n",
+             (int)flag_contact_traced,
+             (int)flag_override);
       return true;
     }
 
@@ -63,15 +73,19 @@ TB::TreatmentBegin(Time t)
 
     // Will they complete treatment? Assume 100% yes
     if (params["TB_p_Tx_cmp"].Sample(rng))
-      TreatmentComplete(ts + 365*params["TB_t_Tx_cmp"].Sample(rng));
+      TreatmentComplete(ts + 365*params["TB_t_Tx_cmp"].Sample(rng),
+                        flag_override);
     else
       TreatmentDropout(ts + 365*params["TB_t_Tx_drop"].Sample(rng));
 
     // Schedule the moment where they will be marked as "treatment-experienced."
     // Right now, this is 1 month after treatment start
-    TreatmentMarkExperienced(ts + 1*30);
+    TreatmentMarkExperienced(ts + 1*30, flag_override);
 
-    if (false && ts > 365*20) {
+    // Don't do contact tracing until 20 years. Also, don't do it if this
+    // TreatmentBegin event is the result of a contact trace. This makes sense
+    // in the case where contact tracing is limited to the household.
+    if (ts > 365*20 && !flag_override) {
       // Do a contact trace
       assert(ContactTraceHandler);
       int cases_found = ContactTraceHandler(ts);
@@ -87,14 +101,21 @@ TB::TreatmentBegin(Time t)
 }
 
   void
-TB::TreatmentMarkExperienced(Time t)
+TB::TreatmentMarkExperienced(Time t, bool flag_override)
 {
-  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
+  auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
+                (auto ts_, auto) -> bool {
 
     assert(lifetm);
 
     if (!AliveStatus())
       return true;
+
+    if (flag_contact_traced && !flag_override) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-markex,1\n");
+      return true;
+    }
 
     if (tb_treatment_status != TBTreatmentStatus::Incomplete)
       return true;

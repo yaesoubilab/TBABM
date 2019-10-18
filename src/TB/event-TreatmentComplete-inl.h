@@ -1,15 +1,22 @@
 #include "../../include/TBABM/TB.h"
 
   void
-TB::TreatmentComplete(Time t)
+TB::TreatmentComplete(Time t, bool flag_override)
 {
-  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) -> bool {
+  auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
+                (auto ts_, auto) -> bool {
     assert(lifetm);
 
     auto ts = static_cast<int>(ts_);
 
     if (!AliveStatus())
       return true;
+
+    if (flag_contact_traced && !flag_override) {
+      flag_contact_traced = false;
+      // printf("ctrace-cancel-txcomplete,1\n");
+      return true;
+    }
 
     // Log(ts, "TB treatment complete");
 
@@ -19,7 +26,7 @@ TB::TreatmentComplete(Time t)
 
     tb_treatment_status = TBTreatmentStatus::Complete;
 
-    Recovery(ts, RecoveryType::Treatment);
+    Recovery(ts, RecoveryType::Treatment, flag_override);
 
     return true;
   };

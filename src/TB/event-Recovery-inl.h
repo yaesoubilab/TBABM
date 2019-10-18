@@ -1,15 +1,16 @@
 #include "../../include/TBABM/TB.h"
 
   void
-TB::Recovery(Time t, RecoveryType r)
+TB::Recovery(Time t, RecoveryType r, bool flag_override)
 {
-  auto lambda = [this, r, l_ptr = GetLifetimePtr()] (auto ts, auto) -> bool {
+  auto lambda = [this, r, flag_override, l_ptr = GetLifetimePtr()]
+                (auto ts, auto) -> bool {
     assert(l_ptr);
 
     if (!AliveStatus())
       return true;
 
-    if (flag_contact_traced) {
+    if (flag_contact_traced && !flag_override) {
       flag_contact_traced = false;
       // printf("ctrace-cancel-recovery,1\n");
       return true;

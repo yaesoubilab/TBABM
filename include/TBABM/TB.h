@@ -133,21 +133,24 @@ class TB
 
     // Marks an individual as having begun treatment.
     // Decides if they will complete treatment, or drop
-    // out. Schedules either event.
-    void TreatmentBegin(Time);
+    // out. Schedules either event. The second parameter is the contact-trace
+    // flag, which should only be set by the ContactTrace function.
+    // The default, 'false' is correct behaviour in the case that the
+    // treatment is being initiated by 'InfectInfectious'
+    void TreatmentBegin(Time, bool flag_override = false);
 
-    void TreatmentMarkExperienced(Time);
+    void TreatmentMarkExperienced(Time, bool flag_override = false);
 
     // Sets tb_treatment_status to Incomplete
     void TreatmentDropout(Time);
 
     // Sets tb_treatment_status to Complete, and 
     // calls Recovery
-    void TreatmentComplete(Time);
+    void TreatmentComplete(Time, bool flag_override = false);
 
     // Marks the individual as recovered, and sets
     // status tb_status to Latent
-    void Recovery(Time, RecoveryType);
+    void Recovery(Time, RecoveryType, bool flag_override = false);
 
     void InternalDeathHandler(Time);
 
