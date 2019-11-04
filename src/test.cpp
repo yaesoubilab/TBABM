@@ -10,6 +10,7 @@
 #include <RNG.h>
 #include <JSONParameterize.h>
 #include <JSONImport.h>
+#include <docopt.h>
 
 #include "../include/TBABM/TBABM.h"
 #include "../include/TBABM/utils/threadpool.h"
