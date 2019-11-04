@@ -225,8 +225,37 @@ bool householdsFileValid(const string& fname)
   return stat(fname.c_str(), &buf) == 0;
 }
 
+static const char USAGE[] =
+R"(TBABM
+    
+    Usage:
+      TBABM -t NUM -n NUM [options]
+
+    Options:
+      -t NUM     Number of trajectories to run.
+      -n NUM     Initial approximate size of population.
+      -p PATH    Path to the parameter file [default: sampleParams.json]
+      -y NUM     Years to simulate [default: 50]
+      -s NUM     Seed of the master PRNG. Default is system time
+      -o PATH    Dir for outputs. Include trailing slash. [default: .]
+      -m NUM     Size of threadpool [default: 1]
+      -h PATH    Location of households file. [default: household_structure.csv]
+      --version  Print version
+)";
+
 int main(int argc, char **argv)
 {
+  std::map<std::string, docopt::value> args
+    = docopt::docopt(USAGE,
+                     { argv+1, argv+argc },
+                     true,                  // show help if requested
+                     "TBABM 0.6.7-alpha2"); // version string
+
+  for (auto const& arg : args) {
+    std::cout << arg.first << arg.second << std::endl;
+  }
+
+  exit(0);
   // Required rguments:
   // -t INTEGER
   // 		The number of trajectories to run.
