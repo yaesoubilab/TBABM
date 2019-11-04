@@ -251,60 +251,9 @@ int main(int argc, char **argv)
                      true,                  // show help if requested
                      "TBABM 0.6.7-alpha2"); // version string
 
-  for (auto const& arg : args) {
-    std::cout << arg.first << arg.second << std::endl;
-  }
-
-  exit(0);
-  // Required rguments:
-  // -t INTEGER
-  // 		The number of trajectories to run.
-  // -n INTEGER
-  // 		The initial population size.
-  // 		
-  // Optional arguments:
-  // -p SHEET_NAME
-  // 		Optional. Path to parameter sheet (as json file). If not specified,
-  // 		uses 'sampleParams.json'
-  // -y INTEGER
-  // 		Optional. Specifies the number of years for the model to run.
-  // -s INTEGER
-  // 		Optional. RNG seed. Default is std::time(NULL).
-  // -o FOLDER_NAME
-  // 		Optional. Folder to store outputs in. Include trailing 
-  // 		forward-slash. Otherwise, outputs to working dir
-  // -m INTEGER
-  // 	    Run in parallel with a pool size of INTEGER.
-  // -h FILE_NAME
-  // 		Load the specified households file. Defaults to household_structure.csv
-
-  string opthelp {\
-    "Required arguments:\n\
-      -t INTEGER\n\
-      The number of trajectories to run.\n\
-      -n INTEGER\n\
-      The initial population size.\n\
-      \n\
-      Optional arguments:\n\
-      -p SHEET_NAME\n\
-      Optional. Path to parameter sheet (as json file). If not specified,\n\
-      uses 'sampleParams.json'\n\
-      -y INTEGER\n\
-      Optional. Specifies the number of years for the model to run.\n\
-      -s INTEGER\n\
-      Optional. RNG seed. Default is std::time(NULL).\n\
-      -o FOLDER_NAME\n\
-      Optional. Folder to store outputs in. Include trailing \n\
-      forward-slash. Otherwise, outputs to working dir\n\
-      -m INTEGER\n\
-      Run in parallel with a pool size of INTEGER.\n\
-      -h FILE_NAME\n\
-      Load the specified households file. Defaults to household_structure.csv"};
-
-  if (argc == 1) {
-    cout << opthelp << std::endl;
-    return EXIT_FAILURE;
-  }
+//  for (auto const& arg : args) {
+//    std::cout << arg.first << arg.second << std::endl;
+//  }
 
   Constants constants {};
 
@@ -326,42 +275,27 @@ int main(int argc, char **argv)
 
   int pool_size {1};
 
-  int opt;
-  while ((opt = getopt(argc, argv, ":t:n:p:y:s:o:m:h:")) != -1)
-  {
-    switch (opt)
-    {
-      case 'h':
-        householdsFile = std::string(optarg);
-        break;
-      case 't':
-        nTrajectories = atoi(optarg);
-        break;
-      case 'n':
-        constants["populationSize"] = atoi(optarg);
-        break;
-      case 'p':
-        parameter_sheet = optarg;
-        break;
-      case 'y':
-        constants["tMax"] = 365 * atoi(optarg);
-        break;
-      case 's':
-        timestamp = atol(optarg);
-        break;
-      case 'm':
-        pool_size = atoi(optarg);
-        break;
-      case 'o':
-        folder = std::string(optarg);
-        break;
-      case '?':
-        printf("Illegal option!\n");
-        exit(1);
-        break;
-    }
+  for (auto const& arg : args) {
+    if (arg.first == "-h")
+      householdsFile = arg.second.asString();
+    else if (arg.first == "-t")
+      nTrajectories = arg.second.asLong();
+    else if (arg.first == "-n")
+      constants["populationSize"] = static_cast<int>(arg.second.asLong());
+    else if (arg.first == "-p")
+      parameter_sheet = arg.second.asString();
+    else if (arg.first == "-y")
+      constants["tMax"] = 365*static_cast<int>(arg.second.asLong());
+    else if (arg.first == "-s")
+      timestamp = arg.second.asLong(); 
+    else if (arg.first == "-m")
+      pool_size = static_cast<int>(arg.second.asLong());
+    else if (arg.first == "-o")
+      folder = arg.second.asString();
   }
 
+  std::cout << householdsFile<<nTrajectories<<constants["populationSize"]<<parameter_sheet<<constants["tMax"]<<timestamp<<pool_size<<folder<<std::endl;
+exit(0);
   // Initialize the master RNG, and write the seed to the file "seed_log.txt"
   RNG rng(timestamp);
 
