@@ -286,7 +286,7 @@ int main(int argc, char **argv)
       parameter_sheet = arg.second.asString();
     else if (arg.first == "-y")
       constants["tMax"] = 365*static_cast<int>(arg.second.asLong());
-    else if (arg.first == "-s")
+    else if (arg.first == "-s" && arg.second)
       timestamp = arg.second.asLong(); 
     else if (arg.first == "-m")
       pool_size = static_cast<int>(arg.second.asLong());
@@ -294,8 +294,6 @@ int main(int argc, char **argv)
       folder = arg.second.asString();
   }
 
-  std::cout << householdsFile<<nTrajectories<<constants["populationSize"]<<parameter_sheet<<constants["tMax"]<<timestamp<<pool_size<<folder<<std::endl;
-exit(0);
   // Initialize the master RNG, and write the seed to the file "seed_log.txt"
   RNG rng(timestamp);
 
