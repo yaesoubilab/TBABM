@@ -60,3 +60,6 @@ TB - Rate(recovery from conv),TB_t_recov_badHIV,v,Exponential,(rate-shift),0.000
 TB - Prob of completing treatment,TB_p_Tx_cmp,v,Bernoulli,p,1.00,,,,T
 TB - Time to complete treatment,TB_t_Tx_cmp,v,Exponential,(rate-shift),2,0,,,T
 TB - Time to dropout from Tx init,TB_t_Tx_drop,v,Exponential,(rate-shift),3,0,,,T
+TB - CT time to home visit,TB_CT_t_visit,v,Constant,(value),0.02,,,,T
+TB - CT fraction homes visited,TB_CT_frac_visit,v,Constant,(value),1.0,,,,T
+TB - CT fraction screened,TB_CT_frac_screened,v,Constant,(value),1.0,,,,T
