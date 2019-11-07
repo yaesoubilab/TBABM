@@ -62,13 +62,13 @@ bool TBABM::Run(void)
 
   while (!eq.Empty()) {
     auto e = eq.Top();
-    assert(e);
+//    assert(e);
 
-    if (e->t > constants["tMax"])
+    if (e.t > constants["tMax"])
       break;
 
     eq.Pop();
-    e->run();
+    e.run();
     events_processed += 1;
   }
 
