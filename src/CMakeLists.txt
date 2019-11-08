@@ -5,6 +5,7 @@ project(TBABM)
 find_package(SimulationLib REQUIRED)
 find_package(StatisticalDistributionsLib REQUIRED)
 find_package(Boost REQUIRED)
+find_package(docopt REQUIRED)
 find_package(Threads REQUIRED)
 
 # Set Demographic files
@@ -70,4 +71,7 @@ configure_file("household_structure.csv" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/hous
 
 add_executable(TBABM ${src})
 target_compile_features(TBABM PUBLIC cxx_std_14)
-target_link_libraries(TBABM PUBLIC SimulationLib StatisticalDistributionsLib ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(TBABM PUBLIC SimulationLib)
+target_link_libraries(TBABM PUBLIC StatisticalDistributionsLib)
+target_link_libraries(TBABM PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(TBABM PUBLIC docopt)

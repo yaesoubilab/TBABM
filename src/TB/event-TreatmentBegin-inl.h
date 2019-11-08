@@ -15,7 +15,10 @@ TB::TreatmentBegin(Time t, bool flag_override)
                 (auto ts_, auto) -> bool {
 
     assert(lifetm);
-    assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
+    // assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
+
+    if (tb_treatment_status == TBTreatmentStatus::Incomplete)
+      return true;
 
     auto ts = static_cast<int>(ts_);
 

@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(TBABM)
 
-find_package(Boost REQUIRED)
-find_package(SimulationLib REQUIRED)
-find_package(StatisticalDistributionsLib REQUIRED)
-
 # Define library version
 # set(TBABM_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
 # set(TBABM_VERSION_MINOR 1 CACHE STRING "minor version" FORCE)
@@ -14,7 +10,6 @@ find_package(StatisticalDistributionsLib REQUIRED)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Add subdirectories
-include_directories(${Boost_INCLUDE_DIRS})
 add_subdirectory(src)
 
 enable_testing()
