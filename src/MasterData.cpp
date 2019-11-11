@@ -53,6 +53,11 @@ MasterData::MasterData(int tMax, int pLength, std::vector<double> ageBreaks) :
   tbTxNaiveAdults("tbTxNaiveAdults", tMax, pLength),
   tbTxNaiveInfectiousAdults("tbTxNaiveInfectiousAdults", tMax, pLength),
 
+  ctHomeVisits("ctHomeVisits", 0, tMax, pLength),
+  ctScreenings("ctScreenings", 0, tMax, pLength),
+  ctCasesFound("ctCasesFound", 0, tMax, pLength),
+  ctDeathsAverted("ctDeathsAverted", 0, tMax, pLength),
+
   activeHouseholdContacts("activeHouseholdContacts"),
 
   pyramid("Population pyramid", 0, tMax, pLength, 2, ageBreaks),
@@ -88,8 +93,12 @@ MasterData::GenIndividualInitData(void)
       tbTxExperiencedInfectiousAdults,
       tbTxNaiveAdults,
       tbTxNaiveInfectiousAdults,
+      ctHomeVisits,
+      ctScreenings,
+      ctCasesFound,
+      ctDeathsAverted,
       activeHouseholdContacts
-        );
+  );
 }
 
   void
@@ -142,6 +151,11 @@ MasterData::Close(void)
   tbTxExperiencedInfectiousAdults.Close();
   tbTxNaiveAdults.Close();
   tbTxNaiveInfectiousAdults.Close();
+
+  ctHomeVisits.Close();
+  ctScreenings.Close();
+  ctCasesFound.Close();
+  ctDeathsAverted.Close();
 
   tbInTreatment.Close();
   tbCompletedTreatment.Close();

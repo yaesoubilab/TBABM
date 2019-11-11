@@ -74,6 +74,11 @@ TimeSeriesExport<int> tbInTreatment;
 TimeSeriesExport<int> tbCompletedTreatment;
 TimeSeriesExport<int> tbDroppedTreatment;
 
+TimeSeriesExport<int> ctHomeVisits;
+TimeSeriesExport<int> ctScreenings;
+TimeSeriesExport<int> ctCasesFound;
+TimeSeriesExport<int> ctDeathsAverted;
+
 PyramidTimeSeriesExport pyramid;
 PyramidTimeSeriesExport deathPyramid;
 PyramidTimeSeriesExport hivInfectionsPyramid;
@@ -143,6 +148,11 @@ bool ExportTrajectory(TBABM& t,
   success &= hivPositivePyramid.Add(     std::move(std::make_shared<decltype(data.hivPositivePyramid)>(data.hivPositivePyramid)), id);
   success &= tbExperiencedPyramid.Add(   std::move(std::make_shared<decltype(data.tbExperiencedPyr)>(data.tbExperiencedPyr)), id);
 
+
+  success &= ctHomeVisits.Add(                        std::move(std::make_shared<decltype(data.ctHomeVisits)>(data.ctHomeVisits)), id);
+  success &= ctScreenings.Add(                        std::move(std::make_shared<decltype(data.ctScreenings)>(data.ctScreenings)), id);
+  success &= ctCasesFound.Add(                        std::move(std::make_shared<decltype(data.ctCasesFound)>(data.ctCasesFound)), id);
+  success &= ctDeathsAverted.Add(                     std::move(std::make_shared<decltype(data.ctDeathsAverted)>(data.ctDeathsAverted)), id);
   success &= tbTxExperiencedAdults.Add(               std::move(std::make_shared<decltype(data.tbTxExperiencedAdults)>(data.tbTxExperiencedAdults)), id);
   success &= tbTxExperiencedInfectiousAdults.Add(     std::move(std::make_shared<decltype(data.tbTxExperiencedInfectiousAdults)>(data.tbTxExperiencedInfectiousAdults)), id);
   success &= tbTxNaiveAdults.Add(                     std::move(std::make_shared<decltype(data.tbTxNaiveAdults)>(data.tbTxNaiveAdults)), id);
@@ -209,6 +219,11 @@ bool WriteData(string outputPrefix)
       tbDroppedTreatment.Write(outputPrefix + "tbDroppedTreatment.csv")   &&   
 
       tbExperiencedPyramid.Write(outputPrefix + "tbExperiencedPyramid.csv") &&
+
+      ctHomeVisits.Write(outputPrefix + "ctHomeVisits.csv") &&
+      ctScreenings.Write(outputPrefix + "ctScreenings.csv") &&
+      ctCasesFound.Write(outputPrefix + "ctCasesFound.csv") &&
+      ctDeathsAverted.Write(outputPrefix + "ctDeathsAverted.csv") &&
 
       tbTxExperiencedAdults.Write(outputPrefix + "tbTxExperiencedAdults.csv") &&
       tbTxExperiencedInfectiousAdults.Write(outputPrefix + "tbTxExperiencedInfectiousAdults.csv") &&

@@ -30,6 +30,11 @@ TBData CreateTBData(IndividualInitData data) {
       data.tbTxNaiveAdults,
       data.tbTxNaiveInfectiousAdults,
 
+      data.ctHomeVisits,
+      data.ctScreenings,
+      data.ctCasesFound,
+      data.ctDeathsAverted,
+
       data.activeHouseholdContacts
   };
 }

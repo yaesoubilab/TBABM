@@ -74,6 +74,11 @@ typedef struct IndividualInitData {
   PrevalenceTimeSeries<int>& tbTxNaiveAdults;
   PrevalenceTimeSeries<int>& tbTxNaiveInfectiousAdults;
 
+  IncidenceTimeSeries<int>& ctHomeVisits;
+  IncidenceTimeSeries<int>& ctScreenings;
+  IncidenceTimeSeries<int>& ctCasesFound;
+  IncidenceTimeSeries<int>& ctDeathsAverted;
+
   DiscreteTimeStatistic& activeHouseholdContacts; // For each individual diagnosed with active TB,
   // the percentage of household contacts who have
   // active TB.
@@ -109,4 +114,4 @@ IndividualSimContext CreateIndividualSimContext(
     RNG &rng,
     map<string, DataFrameFile>& fileData,
     Params& params
-    );
+);
