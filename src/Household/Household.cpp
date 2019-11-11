@@ -242,7 +242,7 @@ Household::ContactTrace(const int& t,
 
   for (auto it = offspring.begin(); it != offspring.end(); it++) {
     assert(*it);
-    if (*it != idv && frac_screened.Sample(rng)) {
+    if (*it && *it != idv && frac_screened.Sample(rng)) {
       result.screenings  += 1;
       result.cases_found += (*it)->tb.ContactTrace(t);
     }
@@ -250,7 +250,7 @@ Household::ContactTrace(const int& t,
 
   for (auto it = other.begin(); it != other.end(); it++) {
     assert(*it);
-    if (*it != idv && frac_screened.Sample(rng)) {
+    if (*it && *it != idv && frac_screened.Sample(rng)) {
       result.screenings  += 1;
       result.cases_found += (*it)->tb.ContactTrace(t);
     }
