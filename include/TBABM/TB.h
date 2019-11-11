@@ -12,6 +12,7 @@
 #include <IncidenceTimeSeries.h>
 
 #include "IndividualTypes.h"
+#include "HouseholdTypes.h"
 #include "TBTypes.h"
 
 using namespace SimulationLib;
@@ -76,7 +77,8 @@ class TB
     TBStatus GetTBStatus(Time);
     bool PreviouslyTreated(void);
 
-    void SetHouseholdCallbacks(function<int(const Time&, Param&, RNG&)> contactTrace,
+    void SetHouseholdCallbacks(
+        function<ContactTraceResult(const Time&, Param&, RNG&)> contactTrace,
         function<void(Time)> progression, 
         function<void(Time)> recovery,
         function<double(void)> householdPrevalence,
@@ -214,6 +216,6 @@ class TB
 
     function<void(Time)> DeathHandler;   
     function<void(Time)> ProgressionHandler;
-    function<int(const Time&, Param&, RNG&)>  ContactTraceHandler;
+    function<ContactTraceResult(const Time&, Param&, RNG&)>  ContactTraceHandler;
     function<void(Time)> RecoveryHandler;
 };

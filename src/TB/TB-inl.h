@@ -31,7 +31,7 @@ TB::GetHIVType(Time t)
 
   void
 TB::SetHouseholdCallbacks(
-  function<int(const Time&, Param&, RNG&)> contactTrace,
+  function<ContactTraceResult(const Time&, Param&, RNG&)> contactTrace,
   function<void(Time)>       progression, 
   function<void(Time)>       recovery,
   function<double(void)>     householdPrevalence,
@@ -84,6 +84,7 @@ TB::InternalDeathHandler(Time t)
     if (flag_contact_traced) {
       flag_contact_traced = false;
       // printf("ctrace-cancel-death,1\n");
+      data.ctDeathsAverted.Record(ts, +1);
       return true;
     }
     

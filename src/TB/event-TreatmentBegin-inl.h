@@ -98,10 +98,12 @@ TB::TreatmentBegin(Time t, bool flag_override)
       eq.QuickSchedule(ts + delay, 
         [this, lifetm, cth=ContactTraceHandler] (auto ts_, auto) -> bool {
 
-        auto cases_found = 
+        auto result = 
           cth(ts_, params["TB_CT_frac_screened"], rng);
 
-        // printf("ctrace,%d\n", cases_found)
+        data.ctHomeVisits.Record(ts_, +1);
+        data.ctCasesFound.Record(ts_, result.cases_found);
+        data.ctScreenings.Record(ts_, result.screenings);
 
         return true;
       });

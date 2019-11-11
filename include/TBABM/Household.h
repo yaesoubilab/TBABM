@@ -7,6 +7,7 @@
 
 #include "Individual.h"
 #include "IndividualTypes.h"
+#include "HouseholdTypes.h"
 #include "TBTypes.h"
 #include "Pointers.h"
 
@@ -45,10 +46,11 @@ class Household {
     // Do a contact trace on the household. Returns the number of cases
     // of active, untreated TB in the household (NOT including the 
     // individual causing the tracing event to occur)
-    int ContactTrace(const int& t,
-                     const shared_p<Individual> idv,
-                     Param& frac_screened,
-                     RNG& rng);
+    ContactTraceResult
+    ContactTrace(const int& t,
+                 const shared_p<Individual> idv,
+                 Param& frac_screened,
+                 RNG& rng);
 
     Household(shared_p<Individual> head,
         shared_p<Individual> spouse,
