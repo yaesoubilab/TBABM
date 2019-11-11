@@ -22,9 +22,15 @@ TB::TreatmentBegin(Time t, bool flag_override)
     if (!AliveStatus())
       return true;
 
+    // Don't begin treatment it was begun in the past becasue of a contact
+    // trace.
     if (flag_contact_traced && !flag_override) {
+     
+      data.ctInfectiousnessAverted(ts - flag_date);
+
+      flag_date = -1; // Reset the flag_date
       flag_contact_traced = false;
-      // printf("ctrace-cancel-treatment,1\n");
+
       return true;
     }
 

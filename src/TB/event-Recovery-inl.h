@@ -11,8 +11,13 @@ TB::Recovery(Time t, RecoveryType r, bool flag_override)
       return true;
 
     if (flag_contact_traced && !flag_override) {
+      
+      assert(flag_date != -1);
+      data.ctInfectiousnessAverted(ts - flag_date);
+
       flag_contact_traced = false;
-      // printf("ctrace-cancel-recovery,1\n");
+      flag_date = -1;
+
       return true;
     }
 
