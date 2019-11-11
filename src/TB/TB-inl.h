@@ -30,17 +30,22 @@ TB::GetHIVType(Time t)
 }
 
   void
-TB::SetHouseholdCallbacks(function<int(Time)> contactTrace,
-    function<void(Time)>       progression, 
-    function<void(Time)>       recovery,
-    function<double(void)>     householdPrevalence,
-    function<double(TBStatus)> contactHouseholdPrevalence)
+TB::SetHouseholdCallbacks(
+  function<int(const Time&, Param&, RNG&)> contactTrace,
+  function<void(Time)>       progression, 
+  function<void(Time)>       recovery,
+  function<double(void)>     householdPrevalence,
+  function<double(TBStatus)> contactHouseholdPrevalence)
 {
-  assert(contactTrace &&
-      progression && 
-      recovery && 
-      householdPrevalence && 
-      contactHouseholdPrevalence);
+  if (!(contactTrace &&
+        progression && 
+        recovery && 
+        householdPrevalence && 
+        contactHouseholdPrevalence)) {
+
+    printf("A household callback in SetHouseholdCallbacks was empty\n");
+    exit(1);
+  }
 
   ContactTraceHandler          = contactTrace;
   ProgressionHandler           = progression;
@@ -52,10 +57,11 @@ TB::SetHouseholdCallbacks(function<int(Time)> contactTrace,
   void
 TB::ResetHouseholdCallbacks(void)
 {
-  ProgressionHandler    = nullptr;
-  ContactTraceHandler   = nullptr;
-  RecoveryHandler       = nullptr;
-  HouseholdTBPrevalence = nullptr;
+  ContactTraceHandler          = nullptr;
+  ProgressionHandler           = nullptr;
+  RecoveryHandler              = nullptr;
+  HouseholdTBPrevalence        = nullptr;
+  ContactHouseholdTBPrevalence = nullptr;
 }
 
 // This function is an interface to the death mechanism provided

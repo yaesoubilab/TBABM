@@ -85,28 +85,30 @@ TB::TreatmentBegin(Time t, bool flag_override)
     // Don't do contact tracing until 20 years. Also, don't do it if this
     // TreatmentBegin event is the result of a contact trace. This makes sense
     // in the case where contact tracing is limited to the household.
-    printf("lolcat");
-//     std::cout << (params["sex"].Sample(rng) ?"male":"female") << std::endl;
-//     if (ts > 365*20 && // At least 2010
-//         !flag_override && // This isn't part of an existing contact trace
-//         params["sex"].Sample(rng)) { // We're actually going
-//                                                        // to visit the HH.
-//       assert(ContactTraceHandler);
-//       
-//       auto delay = 365*params["TB_CT_t_visit"].Sample(rng);
-//       printf("Scheduling a contact trace for %d + %d\n", ts, (int)delay);
-// 
-//       // Schedule a contact trace
-//       eq.QuickSchedule(ts + delay, 
-//         [this, lifetm] (auto ts_, auto) -> bool {
-//         auto cases_found = ContactTraceHandler(ts_);
-//         // printf("ctrace,%d\n", cases_found)
-//         
-//         return true;
-//       });
-//     } else if (ts > 365*20 && !flag_override) { // Not going to trace
-//       printf("Not going to trace\n");
-//     }
+    if (ts > 365*20 && // At least 2010
+        !flag_override && // This isn't part of an existing contact trace
+        params["TB_CT_frac_visit"].Sample(rng)) { // We're actually going
+                                                  // to visit the HH.
+      
+      auto delay = 365*params["TB_CT_t_visit"].Sample(rng);
+
+      // Schedule a contact trace
+      // Remember: have to capture the ContactTraceHandler because individual
+      // might die, but we still want to CT his/her household
+      eq.QuickSchedule(ts + delay, 
+        [this, lifetm, cth=ContactTraceHandler] (auto ts_, auto) -> bool {
+
+        auto cases_found = 
+          cth(ts_, params["TB_CT_frac_screened"], rng);
+
+        // printf("ctrace,%d\n", cases_found)
+
+        return true;
+      });
+
+    } else if (ts > 365*20 && !flag_override) { // Not going to trace
+      // printf("Not going to trace\n");
+    }
 
     return true;
   };

@@ -62,7 +62,11 @@ void Household::AddIndividual(shared_p<Individual> idv, int t, HouseholdPosition
     nInfectiousTBIndivduals += 1;
 
   idv->tb.SetHouseholdCallbacks(
-    [this, idv] (int t) -> int    { return ContactTrace(t, idv); },
+    [this, idv] (const int& t,
+                 Param& frac_screened,
+                 RNG& rng) -> int {
+      return ContactTrace(t, idv, frac_screened, rng);
+    },
 
     [this, idv] (int t) -> void   { nInfectiousTBIndivduals += 1;
                                     TriggerReeval(t, idv); },
@@ -217,24 +221,27 @@ double Household::ContactActiveTBPrevalence(TBStatus s, int t) {
   return ContactActiveTBPrevalence(s);
 }
 
-int Household::ContactTrace(int t, shared_p<Individual> idv) {
+int Household::ContactTrace(const int& t,
+                            const shared_p<Individual> idv,
+                            Param& frac_screened,
+                            RNG& rng) {
 
   int cases_found {0};
 
-  if (head && head != idv)
+  if (head && head != idv && frac_screened.Sample(rng))
     cases_found += head->tb.ContactTrace(t);
-  if (spouse && spouse != idv)
+  if (spouse && spouse != idv && frac_screened.Sample(rng))
     cases_found += spouse->tb.ContactTrace(t);
 
   for (auto it = offspring.begin(); it != offspring.end(); it++) {
     assert(*it);
-    if (*it != idv)
+    if (*it != idv && frac_screened.Sample(rng))
       cases_found += (*it)->tb.ContactTrace(t);
   }
 
   for (auto it = other.begin(); it != other.end(); it++) {
     assert(*it);
-    if (*it != idv)
+    if (*it != idv && frac_screened.Sample(rng))
       cases_found += (*it)->tb.ContactTrace(t);
   }
 
