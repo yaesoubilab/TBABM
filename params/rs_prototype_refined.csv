@@ -4,6 +4,7 @@ Couple forms new household,coupleFormsNewHousehold,v,Bernoulli,p,0.12,,,,F
 Others are married at initialization,otherMarried,v,Bernoulli,p,0.99,,,,F
 Time to first birth,timeToFirstBirth,f,Demographic/time to first birth.json,,,,,,
 Time to subsequent births,timeToSubsequentBirths,f,Demographic/time to subsequent births.json,,,,,,
+Probability of being pregnant,probabilityOfPregnant,f,Demographic/probability of pregnant.json,,,,,,
 Marriage age difference,marriageAgeDifference,v,Johnson Su,(shape-shape-location-scale),2.0084,3.9767,-0.5023,1.0690,F
 Time to divorce,timeToDivorce,v,Weibull,(alpha-beta),1.3685,12.5257,,,F
 Probability of divorce,probabilityOfDivorce,v,Bernoulli,p,0.035,,,,T
@@ -11,6 +12,7 @@ Leaving household,leavingHousehold,v,Exponential,(rate-shift),0.02,0.0,,,T
 Time to looking,timeToLooking,f,Demographic/time to looking.json,,,,,,
 Time to looking – scale,timeToLookingScale,v,Constant,(value),0.45,,,,F
 Time in marriage,timeInMarriage,f,Demographic/time in marriage.json,,,,,,
+Time to death,naturalDeath,f,Demographic/time to natural death bestdata.json,,,,,,
 VCT a_t_i,HIV_a_t_i,f,HIV/VCT a_t_i.json,,,,,,
 VCT sig_i,HIV_sig_i,f,HIV/VCT sig_i.json,,,,,,
 HIV infection risk,HIV_risk,f,HIV/infection risk - nospouse.json,,,,,,
