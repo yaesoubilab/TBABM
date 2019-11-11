@@ -172,6 +172,9 @@ class TB
     // the event that the individual's active TB is identified during a
     // contact trace.
     bool flag_contact_traced = false;
+    int flag_date = -1; // When the last flag went up
+                        // (when the last individual began Tx after being id'd
+                        // by a contact-trace intervention
 
     double risk_window; // How many days in between evals for LTB. unit: [days]
     int risk_window_id; // The "ID" of the window. Incremented on change in

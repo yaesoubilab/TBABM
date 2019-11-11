@@ -34,6 +34,7 @@ TBData CreateTBData(IndividualInitData data) {
       data.ctScreenings,
       data.ctCasesFound,
       data.ctDeathsAverted,
+      data.ctInfectiousnessAverted,
 
       data.activeHouseholdContacts
   };

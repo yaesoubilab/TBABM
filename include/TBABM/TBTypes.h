@@ -73,6 +73,7 @@ typedef struct TBData {
   IncidenceTimeSeries<int>& ctScreenings;
   IncidenceTimeSeries<int>& ctCasesFound;
   IncidenceTimeSeries<int>& ctDeathsAverted;
+  HistT&                    ctInfectiousnessAverted;
 
   DiscreteTimeStatistic& activeHouseholdContacts; // For each individual diagnosed with active TB,
   // the percentage of household contacts who have

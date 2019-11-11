@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/histogram.hpp>
 #include <IncidenceTimeSeries.h>
 #include <PrevalenceTimeSeries.h>
 #include <IncidencePyramidTimeSeries.h>
@@ -8,8 +9,9 @@
 
 #include "IndividualTypes.h"
 
-class MasterData {
+using namespace boost::histogram;
 
+class MasterData {
   private:
   public:
 
@@ -72,6 +74,7 @@ class MasterData {
     IncidenceTimeSeries<int>  ctScreenings;
     IncidenceTimeSeries<int>  ctCasesFound;
     IncidenceTimeSeries<int>  ctDeathsAverted;
+    HistT                     ctInfectiousnessAverted = make_histogram(axis::regular<>(12,0,365));
 
     DiscreteTimeStatistic  activeHouseholdContacts; // For each individual diagnosed with active TB,
     // the percentage of household contacts who have

@@ -5,6 +5,7 @@
 #include <future>
 #include <sys/stat.h>
 #include <cstdint>
+#include <boost/format.hpp>
 
 #include <Normal.h>
 #include <RNG.h>
@@ -104,6 +105,13 @@ bool ExportTrajectory(TBABM& t,
   long id {static_cast<long>(i)};
 
   auto data = t.GetData();
+
+  for (auto&& x : indexed(data.ctInfectiousnessAverted)) {
+    std::cout << boost::format("bin %i [ %.1f, %.1f ): %i\n")
+      % x.index() % x.bin().lower() % x.bin().upper() % *x;
+  }
+
+  std::cout << std::flush;
 
   success &= births.Add(                 std::move(std::make_shared<decltype(data.births)>(data.births)), id);
   success &= deaths.Add(                 std::move(std::make_shared<decltype(data.deaths)>(data.deaths)), id);

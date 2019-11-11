@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/histogram.hpp>
 #include <IncidenceTimeSeries.h>
 #include <PrevalenceTimeSeries.h>
 #include <PrevalencePyramidTimeSeries.h>
@@ -10,6 +11,7 @@
 #include <DataFrame.h>
 #include "Pointers.h"
 
+using namespace boost::histogram;
 using namespace SimulationLib;
 using StatisticalDistributions::RNG;
 using std::function;
@@ -41,6 +43,7 @@ enum class DeathCause {
   Natural, HIV, TB
 };
 
+using HistT = decltype(make_histogram(axis::regular<>(12,0,365)));
 
 typedef struct IndividualInitData {
   IncidenceTimeSeries<int>& tbInfections;  // Individuals transitioning from S to L
@@ -78,6 +81,7 @@ typedef struct IndividualInitData {
   IncidenceTimeSeries<int>& ctScreenings;
   IncidenceTimeSeries<int>& ctCasesFound;
   IncidenceTimeSeries<int>& ctDeathsAverted;
+  HistT&                    ctInfectiousnessAverted;
 
   DiscreteTimeStatistic& activeHouseholdContacts; // For each individual diagnosed with active TB,
   // the percentage of household contacts who have

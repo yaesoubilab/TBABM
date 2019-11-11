@@ -97,6 +97,7 @@ MasterData::GenIndividualInitData(void)
       ctScreenings,
       ctCasesFound,
       ctDeathsAverted,
+      ctInfectiousnessAverted,
       activeHouseholdContacts
   );
 }
