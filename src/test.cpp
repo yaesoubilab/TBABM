@@ -455,7 +455,7 @@ int main(int argc, char **argv)
     file.second->close();
   }
 
-  for (auto&& file: : histFiles) {
+  for (auto&& file : histFiles) {
     file.second->flush();
     file.second->close();
   }
