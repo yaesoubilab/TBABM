@@ -109,6 +109,15 @@ TB::HandleDeath(Time t)
 {
   bool adult = AgeStatus(t) >= 15;
 
+  if (flag_contact_traced) {
+    assert(flag_date != -1);
+    data.ctDeathsAverted.Record(t, +1);
+    data.ctInfectiousnessAverted(t - flag_date);
+
+    flag_contact_traced = false;
+    flag_date = -1;
+  }
+
   switch(tb_status) {
     case (TBStatus::Susceptible):
       data.tbSusceptible.Record(t, -1); break;
