@@ -57,8 +57,6 @@ set(tbabm ${tbabm_path}/TBABM.cpp
 # Set source files
 set(src ${tbabm} ${demographic} ${hiv} ${tb} ${individual} ${household})
 
-include_directories(${Boost_INCLUDE_DIRS})
-
 configure_file("RunTBABM" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/RunTBABM" COPYONLY)
 configure_file("CalibrateTBABM" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CalibrateTBABM" COPYONLY)
 configure_file("WeightLikelihoodsTBABM" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/WeightLikelihoodsTBABM" COPYONLY)
@@ -75,3 +73,4 @@ target_link_libraries(TBABM PUBLIC SimulationLib)
 target_link_libraries(TBABM PUBLIC StatisticalDistributionsLib)
 target_link_libraries(TBABM PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TBABM PUBLIC docopt)
+target_link_libraries(TBABM PUBLIC Boost::boost)
