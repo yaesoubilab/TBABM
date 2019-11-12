@@ -99,16 +99,17 @@ bool ExportTrajectory(TBABM& t,
     std::uint_fast64_t i, 
     std::shared_ptr<ofstream> populationSurvey, 
     std::shared_ptr<ofstream> householdSurvey, 
-    std::shared_ptr<ofstream> deathSurvey)
+    std::shared_ptr<ofstream> deathSurvey,
+    std::shared_ptr<ofstream> ctInfectiousnessAverted)
 {
   bool success {true};
   long id {static_cast<long>(i)};
 
   auto data = t.GetData();
 
-  for (auto&& x : indexed(data.ctInfectiousnessAverted)) {
-    std::cout << boost::format("bin %i [ %.1f, %.1f ): %i\n")
-      % x.index() % x.bin().lower() % x.bin().upper() % *x;
+  for (auto&& x : indexed(data.ctInfectiousnessAverted, coverage::all)) {
+    *ctInfectiousnessAverted << boost::format("%i,%.1f,%.1f,%i\n")
+      % id % x.bin().lower() % x.bin().upper() % *x;
   }
 
   std::cout << std::flush;
@@ -336,7 +337,9 @@ int main(int argc, char **argv)
       {"household", "trajectory,time,hash,size,head,spouse,directOffspring,otherOffspring,other"},
       {"death", "trajectory,time,hash,age,sex,cause,HIV,HIV_date,ART,ART_date,CD4,baseline_CD4"}
   };
+
   std::map<string, std::shared_ptr<ofstream>> surveyFiles;
+  std::map<string, std::shared_ptr<ofstream>> histFiles;
 
   auto prepareSurvey = [outputPrefix](std::pair<string, string> name_and_header) 
     -> std::pair<string, std::shared_ptr<ofstream>> {
@@ -365,6 +368,12 @@ int main(int argc, char **argv)
       std::inserter(surveyFiles, surveyFiles.begin()),
       prepareSurvey);
 
+  histFiles["ctInfectiousnessAverted"] =
+    std::make_shared<ofstream>(outputPrefix + "ctInfectiousnessAverted.csv",
+                               ios_base::out);
+
+  *histFiles["ctInfectiousnessAverted"] << "seed,lower,upper,value" << std::endl;
+
   // Initialize the map of simulation parameters
   std::map<string, Param> params{};
   mapShortNames( fileToJSON(parameter_sheet), params );
@@ -384,7 +393,9 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < nTrajectories; i++) {
     results.emplace_back(
-        pool.enqueue([i, &params, constants, householdsFile, seeds, &mtx, &surveyFiles] {
+        pool.enqueue([i, &params, constants, 
+                      householdsFile, seeds, &mtx,
+                      &surveyFiles, &histFiles] {
           printf("#%4d RUNNING\n", i);
 
           // Initialize a trajectory
@@ -408,7 +419,8 @@ int main(int argc, char **argv)
                 seed,
                 surveyFiles.at("population"),
                 surveyFiles.at("household"),
-                surveyFiles.at("death"))) {
+                surveyFiles.at("death"),
+                histFiles.at("ctInfectiousnessAverted"))) {
 
             printf("Trajectory #%4d: ExportTrajectrory(1) failed\n", i);
             mtx.unlock();
@@ -439,6 +451,11 @@ int main(int argc, char **argv)
   }
 
   for (auto && file : surveyFiles) {
+    file.second->flush();
+    file.second->close();
+  }
+
+  for (auto&& file: : histFiles) {
     file.second->flush();
     file.second->close();
   }
