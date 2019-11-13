@@ -8,11 +8,11 @@
 #include <DiscreteTimeStatistic.h>
 
 #include "IndividualTypes.h"
+#include "TBTypes.h"
 
 using namespace boost::histogram;
 
 class MasterData {
-  private:
   public:
 
     IncidenceTimeSeries<int> births;
@@ -82,9 +82,7 @@ class MasterData {
 
     MasterData(int tMax, int pLength, std::vector<double> ageBreaks);
 
-    IndividualInitData
-      GenIndividualInitData(void);
-
-    void
-      Close(void);
+    void Close(void);
+    
+  private:
 };

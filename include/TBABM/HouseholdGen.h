@@ -10,6 +10,7 @@
 #include "IndividualTypes.h"
 #include "Names.h"
 #include "Pointers.h"
+#include "MasterData.h"
 
 #include <StatisticalDistribution.h>
 #include <EventQueue.h>
@@ -40,10 +41,10 @@ class HouseholdGen {
         Params& (params),
         map<string, DataFrameFile>& (fileData),
         EQ& event_queue,
-        std::function<IndividualInitData()> GetInitData,
+        MasterData& master_data,
         IndividualHandlers handles) : 
       file(file), params(params), fileData(fileData), 
-      event_queue(event_queue), GetInitData(GetInitData),
+      event_queue(event_queue), masterData(master_data),
       initHandles(handles) {
         FILE *ifile = fopen(file, "r");
         int c;
@@ -118,7 +119,7 @@ class HouseholdGen {
     map<string, DataFrameFile>& fileData;
 
     EQ& event_queue;
-    std::function<IndividualInitData()> GetInitData;
+    MasterData& masterData;
     IndividualHandlers initHandles;
     Names name_gen;
 

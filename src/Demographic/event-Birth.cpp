@@ -26,8 +26,6 @@ EventFunc TBABM::Birth(weak_p<Individual> mother_w, weak_p<Individual> father_w)
       HouseholdPosition householdPosition = HouseholdPosition::Offspring;
       MarriageStatus marriageStatus = MarriageStatus::Single;
 
-      auto initData = data.GenIndividualInitData();
-
       auto deathHandler = [this] (weak_p<Individual> idv, int t, DeathCause cause) -> void { 
         return Schedule(t, Death(idv, cause));
       };
@@ -39,7 +37,7 @@ EventFunc TBABM::Birth(weak_p<Individual> mother_w, weak_p<Individual> father_w)
       // Construct baby
       auto baby = makeIndividual(
           CreateIndividualSimContext(t, eq, rng, fileData, params),
-          initData,
+          data,
           CreateIndividualHandlers(deathHandler, GlobalTBHandler),
           name_gen.getName(rng),
           mother->householdID, t, sex,

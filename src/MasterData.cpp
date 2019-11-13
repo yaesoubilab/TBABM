@@ -63,46 +63,10 @@ MasterData::MasterData(int tMax, int pLength, std::vector<double> ageBreaks) :
   pyramid("Population pyramid", 0, tMax, pLength, 2, ageBreaks),
   deathPyramid("Death pyramid", 0, tMax, pLength, 2, ageBreaks),
   householdsCount("households", 0, tMax, pLength)
-{}
-
-  IndividualInitData
-MasterData::GenIndividualInitData(void)
 {
-  return CreateIndividualInitData(
-      tbInfections,
-      tbIncidence,
-      tbRecoveries,
-      tbInfectionsHousehold,
-      tbInfectionsCommunity,
-      tbSusceptible,
-      tbLatent,
-      tbInfectious,
-      tbExperienced,
-      tbExperiencedPyr,
-      tbTreatmentBegin,
-      tbTreatmentBeginHIV,
-      tbTreatmentBeginChildren,
-      tbTreatmentBeginAdultsNaive,
-      tbTreatmentBeginAdultsExperienced,
-      tbTreatmentEnd,
-      tbTreatmentDropout,
-      tbInTreatment,
-      tbCompletedTreatment,
-      tbDroppedTreatment,
-      tbTxExperiencedAdults,
-      tbTxExperiencedInfectiousAdults,
-      tbTxNaiveAdults,
-      tbTxNaiveInfectiousAdults,
-      ctHomeVisits,
-      ctScreenings,
-      ctCasesFound,
-      ctDeathsAverted,
-      ctInfectiousnessAverted,
-      activeHouseholdContacts
-  );
 }
 
-  void
+void
 MasterData::Close(void)
 {
   births.Close();

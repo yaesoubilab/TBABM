@@ -10,6 +10,7 @@
 
 #include <EventQueue.h>
 
+#include "MasterData.h"
 #include "Pointers.h"
 #include "IndividualTypes.h"
 #include "TBTypes.h"
@@ -162,7 +163,7 @@ class Individual : public std::enable_shared_from_this<Individual> {
     }
 
     Individual(IndividualSimContext isc,
-        IndividualInitData data,
+        MasterData& data,
         IndividualHandlers handles_,
         string name,
         long householdID_, int birthDate, Sex sex,
@@ -193,7 +194,7 @@ class Individual : public std::enable_shared_from_this<Individual> {
       onART(false),
       hivStatus(HIVStatus::Negative),
       dead(false),
-      tb(CreateTBData(data),
+      tb(data,
           std::forward<IndividualSimContext>(isc),
           CreateTBHandlers(std::bind(&Individual::TBDeathHandler, this, std::placeholders::_1)),
           TBQueryHandlersInit(),
@@ -201,7 +202,7 @@ class Individual : public std::enable_shared_from_this<Individual> {
           sex) {};
 
     Individual(IndividualSimContext isc,
-        IndividualInitData data,
+        MasterData& data,
         IndividualHandlers handles,
         string name,
         long hid, 

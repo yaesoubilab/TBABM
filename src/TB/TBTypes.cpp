@@ -1,45 +1,5 @@
 #include "../../include/TBABM/TBTypes.h"
 
-TBData CreateTBData(IndividualInitData data) {
-  return {
-    data.tbInfections,
-      data.tbIncidence,
-      data.tbRecoveries,
-      data.tbInfectionsHousehold,
-      data.tbInfectionsCommunity,
-      data.tbSusceptible,
-      data.tbLatent,
-      data.tbInfectious,
-      data.tbExperienced,
-      data.tbExperiencedPyr,
-
-      data.tbTreatmentBegin,
-      data.tbTreatmentBeginHIV,
-      data.tbTreatmentBeginChildren,
-      data.tbTreatmentBeginAdultsNaive,
-      data.tbTreatmentBeginAdultsExperienced,
-
-      data.tbTreatmentEnd,
-      data.tbTreatmentDropout,
-      data.tbInTreatment,
-      data.tbCompletedTreatment,
-      data.tbDroppedTreatment,
-
-      data.tbTxExperiencedAdults,
-      data.tbTxExperiencedInfectiousAdults,
-      data.tbTxNaiveAdults,
-      data.tbTxNaiveInfectiousAdults,
-
-      data.ctHomeVisits,
-      data.ctScreenings,
-      data.ctCasesFound,
-      data.ctDeathsAverted,
-      data.ctInfectiousnessAverted,
-
-      data.activeHouseholdContacts
-  };
-}
-
 TBHandlers CreateTBHandlers(function<void(int)> death) {
   return {
     death

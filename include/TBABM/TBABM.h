@@ -70,7 +70,7 @@ class TBABM {
           params,
           fileData,
           eq,
-          [this] (void) { return data.GenIndividualInitData(); },
+          data,
           CreateIndividualHandlers([this] (weak_ptr<Individual> i, int t, DeathCause dc) -> void { return Schedule(t, Death(i, dc)); },
             [this] (int t) -> double { return (double)data.tbInfectious(t)/(double)data.populationSize(t); }))
       {

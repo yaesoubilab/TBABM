@@ -11,6 +11,7 @@
 #include <DataFrame.h>
 #include <IncidenceTimeSeries.h>
 
+#include "MasterData.h"
 #include "IndividualTypes.h"
 #include "HouseholdTypes.h"
 #include "TBTypes.h"
@@ -33,7 +34,7 @@ class TB
     using HouseholdTB = bool;
     using HIVType     = enum class HIVType { Neg, Good, Bad };
 
-    TB(TBData initData,
+    TB(MasterData& initData,
         TBSimContext initCtx,
         TBHandlers initHandlers,
         TBQueryHandlers initQueryHandlers,
@@ -196,7 +197,7 @@ class TB
 
     int init_time;
 
-    TBData data; // Where all the references to timeseries data live
+    MasterData& data; // Where all the references to timeseries data live
 
     //////////////////////////////////////////////////////////////////////////
     // Query functions

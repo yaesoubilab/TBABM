@@ -4,7 +4,7 @@
 
 #include "../../include/TBABM/HouseholdGen.h"
 
-  shared_p<Household>
+shared_p<Household>
 HouseholdGen::GetHousehold(const int current_time, const int hid, RNG& rng)
 {
   // Create a blank Household object
@@ -25,13 +25,11 @@ HouseholdGen::GetHousehold(const int current_time, const int hid, RNG& rng)
       rng,
       fileData,
       params
-      );
-
-  auto initData = GetInitData();
+  );
 
   auto head = makeIndividual(
       initSimContext,
-      initData,
+      masterData,
       initHandles,
       name_gen.getName(rng), 
       hid, 
@@ -39,7 +37,7 @@ HouseholdGen::GetHousehold(const int current_time, const int hid, RNG& rng)
       _head.sex, 
       _head.role, 
       MarriageStatus::Single
-      );
+  );
 
   // Add this object to the household as the head
   household->AddIndividual(head, current_time, HouseholdPosition::Head);
@@ -54,7 +52,7 @@ HouseholdGen::GetHousehold(const int current_time, const int hid, RNG& rng)
     MicroIndividual midv = family[i];
     auto idv = makeIndividual(
         initSimContext,
-        initData,
+        masterData,
         initHandles,
         name_gen.getName(rng), 
         hid, 
