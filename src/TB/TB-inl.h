@@ -66,7 +66,8 @@ TB::ResetHouseholdCallbacks(void)
 
 // This function is an interface to the death mechanism provided
 // by Individual. It makes sure that the 'flag_contact_trace' has not been
-// put up before scheduling the Individual-level death mechanism.
+// put up before scheduling the Individual-level death mechanism. It is only
+// run for a TB death.
 void
 TB::InternalDeathHandler(Time t)
 {
@@ -83,7 +84,14 @@ TB::InternalDeathHandler(Time t)
     // and pretend the event never happened.
     if (flag_contact_traced) {
       assert(flag_date != -1);
+
       data.ctDeathsAverted.Record(ts, +1);
+
+      if (GetHIVStatus() == HIVStatus::Positive)
+        data.ctDeathsAvertedHIV.Record(ts, +1);
+      if (AgeStatus(ts) < 5)
+        data.ctDeathsAvertedChildren.Record(ts, +1);
+      
       data.ctInfectiousnessAverted(ts - flag_date);
       
       flag_contact_traced = false;
@@ -109,10 +117,19 @@ TB::HandleDeath(Time t)
 {
   bool adult = AgeStatus(t) >= 15;
 
+  auto ts = static_cast<int>(t);
+
   if (flag_contact_traced) {
     assert(flag_date != -1);
+
     data.ctDeathsAverted.Record(t, +1);
-    data.ctInfectiousnessAverted(t - flag_date);
+    
+    if (GetHIVStatus() == HIVStatus::Positive)
+      data.ctDeathsAvertedHIV.Record(ts, +1);
+    if (AgeStatus(t) < 5)
+      data.ctDeathsAvertedChildren.Record(ts, +1);
+      
+    data.ctInfectiousnessAverted(ts - flag_date);
 
     flag_contact_traced = false;
     flag_date = -1;

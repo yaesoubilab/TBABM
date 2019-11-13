@@ -108,8 +108,14 @@ TB::TreatmentBegin(Time t, bool flag_override)
           cth(ts_, params["TB_CT_frac_screened"], rng);
 
         data.ctHomeVisits.Record(ts_, +1);
-        data.ctCasesFound.Record(ts_, result.cases_found);
-        data.ctScreenings.Record(ts_, result.screenings);
+
+        data.ctCasesFound.Record(ts_,         result.cases_found);
+        data.ctCasesFoundHIV.Record(ts_,      result.cases_found_hiv);
+        data.ctCasesFoundChildren.Record(ts_, result.cases_found_children);
+
+        data.ctScreenings.Record(ts_,         result.screenings);
+        data.ctScreeningsHIV.Record(ts_,      result.screenings_hiv);
+        data.ctScreeningsChildren.Record(ts_, result.screenings_children);
 
         return true;
       });

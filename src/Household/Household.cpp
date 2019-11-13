@@ -228,31 +228,61 @@ Household::ContactTrace(const int& t,
                         RNG& rng) {
 
   ContactTraceResult result;
-  result.cases_found = 0;
-  result.screenings  = 0;
+
+  result.cases_found          = 0;
+  result.cases_found_hiv      = 0;
+  result.cases_found_children = 0;
+
+  result.screenings           = 0;
+  result.screenings_hiv       = 0;
+  result.screenings_children  = 0;
 
   if (head && head != idv && !head->dead && frac_screened.Sample(rng)) {
-    result.screenings  += 1;
-    result.cases_found += head->tb.ContactTrace(t);
+    result.screenings += 1;
+    result.screenings_hiv += head->hivStatus == HIVStatus::Positive  ? 1 : 0;
+    result.screenings_children += head->age(t) < 5                   ? 1 : 0;
+
+    int positive = head->tb.ContactTrace(t);
+    result.cases_found += positive;
+    result.cases_found_hiv += positive && head->hivStatus == HIVStatus::Positive ? 1 : 0;
+    result.cases_found_children += positive && head->age(t) < 5                  ? 1 : 0;
   }
   if (spouse && spouse != idv && !spouse->dead && frac_screened.Sample(rng)) {
-    result.screenings  += 1;
-    result.cases_found += spouse->tb.ContactTrace(t);
+    result.screenings += 1;
+    result.screenings_hiv += spouse->hivStatus == HIVStatus::Positive  ? 1 : 0;
+    result.screenings_children += spouse->age(t) < 5                   ? 1 : 0;
+
+    int positive = spouse->tb.ContactTrace(t);
+    result.cases_found += positive;
+    result.cases_found_hiv += positive && spouse->hivStatus == HIVStatus::Positive ? 1 : 0;
+    result.cases_found_children += positive && spouse->age(t) < 5                  ? 1 : 0;
   }
 
   for (auto it = offspring.begin(); it != offspring.end(); it++) {
     assert(*it);
     if (*it && *it != idv && !(*it)->dead && frac_screened.Sample(rng)) {
-      result.screenings  += 1;
-      result.cases_found += (*it)->tb.ContactTrace(t);
+      result.screenings += 1;
+      result.screenings_hiv += (*it)->hivStatus == HIVStatus::Positive  ? 1 : 0;
+      result.screenings_children += (*it)->age(t) < 5                   ? 1 : 0;
+
+      int positive = (*it)->tb.ContactTrace(t);
+      result.cases_found += positive;
+      result.cases_found_hiv += positive && (*it)->hivStatus == HIVStatus::Positive ? 1 : 0;
+      result.cases_found_children += positive && (*it)->age(t) < 5                  ? 1 : 0;
     }
   }
 
   for (auto it = other.begin(); it != other.end(); it++) {
     assert(*it);
     if (*it && *it != idv && !(*it)->dead && frac_screened.Sample(rng)) {
-      result.screenings  += 1;
-      result.cases_found += (*it)->tb.ContactTrace(t);
+      result.screenings += 1;
+      result.screenings_hiv += (*it)->hivStatus == HIVStatus::Positive  ? 1 : 0;
+      result.screenings_children += (*it)->age(t) < 5                   ? 1 : 0;
+
+      int positive = (*it)->tb.ContactTrace(t);
+      result.cases_found += positive;
+      result.cases_found_hiv += positive && (*it)->hivStatus == HIVStatus::Positive ? 1 : 0;
+      result.cases_found_children += positive && (*it)->age(t) < 5                  ? 1 : 0;
     }
   }
 

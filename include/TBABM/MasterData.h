@@ -70,11 +70,17 @@ class MasterData {
     PrevalenceTimeSeries<int> tbTxNaiveAdults;
     PrevalenceTimeSeries<int> tbTxNaiveInfectiousAdults;
 
-    IncidenceTimeSeries<int>  ctHomeVisits;
-    IncidenceTimeSeries<int>  ctScreenings;
-    IncidenceTimeSeries<int>  ctCasesFound;
-    IncidenceTimeSeries<int>  ctDeathsAverted;
-    HistT                     ctInfectiousnessAverted = make_histogram(axis::regular<>(12,0,365));
+    IncidenceTimeSeries<int> ctHomeVisits;
+    IncidenceTimeSeries<int> ctScreenings;
+    IncidenceTimeSeries<int> ctScreeningsHIV;
+    IncidenceTimeSeries<int> ctScreeningsChildren;
+    IncidenceTimeSeries<int> ctCasesFound;
+    IncidenceTimeSeries<int> ctCasesFoundHIV;
+    IncidenceTimeSeries<int> ctCasesFoundChildren;
+    IncidenceTimeSeries<int> ctDeathsAverted;
+    IncidenceTimeSeries<int> ctDeathsAvertedHIV;
+    IncidenceTimeSeries<int> ctDeathsAvertedChildren;
+    HistT                    ctInfectiousnessAverted = make_histogram(axis::regular<>(12,0,365));
 
     DiscreteTimeStatistic  activeHouseholdContacts; // For each individual diagnosed with active TB,
     // the percentage of household contacts who have

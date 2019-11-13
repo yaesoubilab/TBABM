@@ -77,8 +77,14 @@ TimeSeriesExport<int> tbDroppedTreatment;
 
 TimeSeriesExport<int> ctHomeVisits;
 TimeSeriesExport<int> ctScreenings;
+TimeSeriesExport<int> ctScreeningsHIV;
+TimeSeriesExport<int> ctScreeningsChildren;
 TimeSeriesExport<int> ctCasesFound;
+TimeSeriesExport<int> ctCasesFoundHIV;
+TimeSeriesExport<int> ctCasesFoundChildren;
 TimeSeriesExport<int> ctDeathsAverted;
+TimeSeriesExport<int> ctDeathsAvertedHIV;
+TimeSeriesExport<int> ctDeathsAvertedChildren;
 
 PyramidTimeSeriesExport pyramid;
 PyramidTimeSeriesExport deathPyramid;
@@ -157,16 +163,21 @@ bool ExportTrajectory(TBABM& t,
   success &= hivPositivePyramid.Add(     std::move(std::make_shared<decltype(data.hivPositivePyramid)>(data.hivPositivePyramid)), id);
   success &= tbExperiencedPyramid.Add(   std::move(std::make_shared<decltype(data.tbExperiencedPyr)>(data.tbExperiencedPyr)), id);
 
+  success &= ctHomeVisits.Add(std::move(           std::make_shared<decltype(data.ctHomeVisits)>(data.ctHomeVisits)), id);
+  success &= ctScreenings.Add(std::move(           std::make_shared<decltype(data.ctScreenings)>(data.ctScreenings)), id);
+  success &= ctScreeningsHIV.Add(std::move(        std::make_shared<decltype(data.ctScreeningsHIV)>(data.ctScreeningsHIV)), id);
+  success &= ctScreeningsChildren.Add(std::move(   std::make_shared<decltype(data.ctScreeningsChildren)>(data.ctScreeningsChildren)), id);
+  success &= ctCasesFound.Add(std::move(           std::make_shared<decltype(data.ctCasesFound)>(data.ctCasesFound)), id);
+  success &= ctCasesFoundHIV.Add(std::move(        std::make_shared<decltype(data.ctCasesFoundHIV)>(data.ctCasesFoundHIV)), id);
+  success &= ctCasesFoundChildren.Add(std::move(   std::make_shared<decltype(data.ctCasesFoundChildren)>(data.ctCasesFoundChildren)), id);
+  success &= ctDeathsAverted.Add(std::move(        std::make_shared<decltype(data.ctDeathsAverted)>(data.ctDeathsAverted)), id);
+  success &= ctDeathsAvertedHIV.Add(std::move(     std::make_shared<decltype(data.ctDeathsAvertedHIV)>(data.ctDeathsAvertedHIV)), id);
+  success &= ctDeathsAvertedChildren.Add(std::move(std::make_shared<decltype(data.ctDeathsAvertedChildren)>(data.ctDeathsAvertedChildren)), id);
 
-  success &= ctHomeVisits.Add(                        std::move(std::make_shared<decltype(data.ctHomeVisits)>(data.ctHomeVisits)), id);
-  success &= ctScreenings.Add(                        std::move(std::make_shared<decltype(data.ctScreenings)>(data.ctScreenings)), id);
-  success &= ctCasesFound.Add(                        std::move(std::make_shared<decltype(data.ctCasesFound)>(data.ctCasesFound)), id);
-  success &= ctDeathsAverted.Add(                     std::move(std::make_shared<decltype(data.ctDeathsAverted)>(data.ctDeathsAverted)), id);
   success &= tbTxExperiencedAdults.Add(               std::move(std::make_shared<decltype(data.tbTxExperiencedAdults)>(data.tbTxExperiencedAdults)), id);
   success &= tbTxExperiencedInfectiousAdults.Add(     std::move(std::make_shared<decltype(data.tbTxExperiencedInfectiousAdults)>(data.tbTxExperiencedInfectiousAdults)), id);
   success &= tbTxNaiveAdults.Add(                     std::move(std::make_shared<decltype(data.tbTxNaiveAdults)>(data.tbTxNaiveAdults)), id);
   success &= tbTxNaiveInfectiousAdults.Add(           std::move(std::make_shared<decltype(data.tbTxNaiveInfectiousAdults)>(data.tbTxNaiveInfectiousAdults)), id);
-
 
   success &= activeHouseholdContacts.Add(std::move(std::make_shared<decltype(data.activeHouseholdContacts)>(data.activeHouseholdContacts)));
 
@@ -231,8 +242,14 @@ bool WriteData(string outputPrefix)
 
       ctHomeVisits.Write(outputPrefix + "ctHomeVisits.csv") &&
       ctScreenings.Write(outputPrefix + "ctScreenings.csv") &&
+      ctScreeningsHIV.Write(outputPrefix + "ctScreeningsHIV.csv") &&
+      ctScreeningsChildren.Write(outputPrefix + "ctScreeningsChildren.csv") &&
       ctCasesFound.Write(outputPrefix + "ctCasesFound.csv") &&
+      ctCasesFoundHIV.Write(outputPrefix + "ctCasesFoundHIV.csv") &&
+      ctCasesFoundChildren.Write(outputPrefix + "ctCasesFoundChildren.csv") &&
       ctDeathsAverted.Write(outputPrefix + "ctDeathsAverted.csv") &&
+      ctDeathsAvertedHIV.Write(outputPrefix + "ctDeathsAvertedHIV.csv") &&
+      ctDeathsAvertedChildren.Write(outputPrefix + "ctDeathsAvertedChildren.csv") &&
 
       tbTxExperiencedAdults.Write(outputPrefix + "tbTxExperiencedAdults.csv") &&
       tbTxExperiencedInfectiousAdults.Write(outputPrefix + "tbTxExperiencedInfectiousAdults.csv") &&

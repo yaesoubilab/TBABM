@@ -55,9 +55,15 @@ MasterData::MasterData(int tMax, int pLength, std::vector<double> ageBreaks) :
 
   ctHomeVisits("ctHomeVisits", 0, tMax, pLength),
   ctScreenings("ctScreenings", 0, tMax, pLength),
+  ctScreeningsHIV("ctScreeningsHIV", 0, tMax, pLength),
+  ctScreeningsChildren("ctScreeningsChildren", 0, tMax, pLength),
   ctCasesFound("ctCasesFound", 0, tMax, pLength),
+  ctCasesFoundHIV("ctCasesFoundHIV", 0, tMax, pLength),
+  ctCasesFoundChildren("ctCasesFoundChildren", 0, tMax, pLength),
   ctDeathsAverted("ctDeathsAverted", 0, tMax, pLength),
-
+  ctDeathsAvertedHIV("ctDeathsAvertedHIV", 0, tMax, pLength),
+  ctDeathsAvertedChildren("ctDeathsAvertedChildren", 0, tMax, pLength),
+  
   activeHouseholdContacts("activeHouseholdContacts"),
 
   pyramid("Population pyramid", 0, tMax, pLength, 2, ageBreaks),
@@ -119,8 +125,14 @@ MasterData::Close(void)
 
   ctHomeVisits.Close();
   ctScreenings.Close();
+  ctScreeningsHIV.Close();
+  ctScreeningsChildren.Close();
   ctCasesFound.Close();
+  ctCasesFoundHIV.Close();
+  ctCasesFoundChildren.Close();
   ctDeathsAverted.Close();
+  ctDeathsAvertedHIV.Close();
+  ctDeathsAvertedChildren.Close();
 
   tbInTreatment.Close();
   tbCompletedTreatment.Close();
