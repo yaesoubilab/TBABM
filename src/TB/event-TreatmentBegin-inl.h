@@ -104,6 +104,14 @@ TB::TreatmentBegin(Time t, bool flag_override)
       eq.QuickSchedule(ts + delay, 
         [this, lifetm, cth=ContactTraceHandler] (auto ts_, auto) -> bool {
 
+        // Do NOT trace household if dead!! Memory errors...could develop a
+        // workaround to this problem. Issue is that when the dead person is
+        // the last person in their household to die, the household is deleted,
+        // so there would have to be a way to detect that the household doesn't
+        // exist without actually accessing it and segfaulting.
+        if (!AliveStatus())
+          return true;
+
         auto result = 
           cth(ts_, params["TB_CT_frac_screened"], rng);
 
