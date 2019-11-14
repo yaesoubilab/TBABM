@@ -15,6 +15,7 @@
 
 #include "../include/TBABM/TBABM.h"
 #include "../include/TBABM/utils/threadpool.h"
+#include "../include/TBABM/TBTypes.h"
 
 using Constants = TBABM::Constants;
 
@@ -268,21 +269,29 @@ bool householdsFileValid(const string& fname)
 
 static const char USAGE[] =
 R"(TBABM
-    
-    Usage:
-      TBABM -t NUM -n NUM [options]
 
-    Options:
-      -t NUM     Number of trajectories to run.
-      -n NUM     Initial approximate size of population.
-      -p PATH    Path to the parameter file [default: sampleParams.json]
-      -y NUM     Years to simulate [default: 50]
-      -s NUM     Seed of the master PRNG. Default is system time
-      -o PATH    Dir for outputs. Include trailing slash. [default: .]
-      -m NUM     Size of threadpool [default: 1]
-      -h PATH    Location of households file. [default: household_structure.csv]
-      --version  Print version
+Usage:
+  TBABM -t NUM -n NUM [options]
+
+Options:
+  -t NUM     Number of trajectories to run.
+  -n NUM     Initial approximate size of population.
+  -p PATH    Path to the parameter file [default: sampleParams.json]
+  -y NUM     Years to simulate [default: 50]
+  -s NUM     Seed of the master PRNG. Default is system time
+  -o PATH    Dir for outputs. Include trailing slash. [default: .]
+  -m NUM     Size of threadpool [default: 1]
+  -h PATH    Location of households file. [default: household_structure.csv]
+  --ctrace=(all|vul|prob)  Type of contact tracing to perform
+
+    all:  Always contact trace an index case's household
+    vul:  Only contact trace vulnerable households (HIV+/<5yo)
+    prob: Use the probability given by "TB_CT_frac_visit" to decide whether to screen
+
+  --version  Print version
 )";
+
+CTraceType trace_kind = CTraceType::None;
 
 int main(int argc, char **argv)
 {
@@ -292,9 +301,9 @@ int main(int argc, char **argv)
                      true,                  // show help if requested
                      "TBABM 0.6.7-alpha2"); // version string
 
-//  for (auto const& arg : args) {
-//    std::cout << arg.first << arg.second << std::endl;
-//  }
+  for (auto const& arg : args) {
+    std::cout << arg.first << arg.second << std::endl;
+  }
 
   Constants constants {};
 
@@ -333,6 +342,14 @@ int main(int argc, char **argv)
       pool_size = static_cast<int>(arg.second.asLong());
     else if (arg.first == "-o")
       folder = arg.second.asString();
+    else if (arg.first == "--ctrace") {
+      if (arg.second && arg.second.asString() == "all")
+        trace_kind = CTraceType::All;
+      else if (arg.second && arg.second.asString() == "vul")
+        trace_kind = CTraceType::Vul; 
+      else if (arg.second && arg.second.asString() == "prob")
+        trace_kind = CTraceType::Prob;
+    }
   }
 
   // Initialize the master RNG, and write the seed to the file "seed_log.txt"
