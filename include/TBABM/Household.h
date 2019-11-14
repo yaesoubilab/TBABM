@@ -43,6 +43,9 @@ class Household {
     double ContactActiveTBPrevalence(TBStatus);
     double ContactActiveTBPrevalence(TBStatus, int t);
 
+    // Returns true iff one of the members of the household is HIV+ or <5yo
+    bool HasVulnerable(int t);
+
     // Do a contact trace on the household. Returns the number of cases
     // of active, untreated TB in the household (NOT including the 
     // individual causing the tracing event to occur)

@@ -221,6 +221,26 @@ double Household::ContactActiveTBPrevalence(TBStatus s, int t) {
   return ContactActiveTBPrevalence(s);
 }
 
+bool
+Household::HasVulnerable(int t)
+{
+  auto pred = [t] (std::shared_ptr<Individual> idv) {
+    if (!idv)
+      return false;
+
+    return idv->age(t) < 5 || idv->hivStatus == HIVStatus::Positive;
+  };
+  
+  auto op = [&pred] (const bool vulnerable, const std::shared_ptr<Individual> idv) {
+    return vulnerable || pred(idv);
+  };
+
+  return pred(head) || \
+         pred(spouse) || \
+         std::accumulate(offspring.begin(), offspring.end(), false, op) || \
+         std::accumulate(other.begin(), other.end(), false, op);
+}
+
 ContactTraceResult
 Household::ContactTrace(const int& t,
                         const shared_p<Individual> idv,
@@ -247,6 +267,7 @@ Household::ContactTrace(const int& t,
     result.cases_found_hiv += positive && head->hivStatus == HIVStatus::Positive ? 1 : 0;
     result.cases_found_children += positive && head->age(t) < 5                  ? 1 : 0;
   }
+
   if (spouse && spouse != idv && !spouse->dead && frac_screened.Sample(rng)) {
     result.screenings += 1;
     result.screenings_hiv += spouse->hivStatus == HIVStatus::Positive  ? 1 : 0;
