@@ -127,6 +127,9 @@ TB::TreatmentBegin(Time t, bool flag_override)
         auto result = 
           cth(ts_, params["TB_CT_frac_screened"], rng);
 
+        if (!result.did_visit)
+          return true;
+
         data.ctHomeVisits.Record(ts_, +1);
 
         data.ctCasesFound.Record(ts_,         result.cases_found);

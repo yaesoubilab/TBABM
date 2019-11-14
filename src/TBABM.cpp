@@ -56,6 +56,15 @@ bool TBABM::Run(void)
   Schedule(1, ARTGuidelineChange());
   Schedule(1, Survey());
 
+  // Schedule(365*40, [this] (auto ts_, auto) -> bool {
+  //   for (auto&& hh : households) {
+  //     if (hh.second)
+  //       std::cout << "n_contact_traces," << hh.second->n_contact_traces << std::endl;
+  //   }
+
+  //   return true;
+  // });
+
   // Schedule(1, ExogenousBirth());
 
   int events_processed {0};

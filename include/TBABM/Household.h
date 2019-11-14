@@ -24,6 +24,8 @@ class Household {
 
     void PrintHousehold(int t);
 
+    int n_contact_traces = 0;
+
     // Right now, these functions mean the same thing,
     // and 't' is not used.
     int size(int t);

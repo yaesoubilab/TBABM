@@ -235,10 +235,10 @@ Household::HasVulnerable(int t)
     return vulnerable || pred(idv);
   };
 
-  return pred(head) || \
-         pred(spouse) || \
-         std::accumulate(offspring.begin(), offspring.end(), false, op) || \
-         std::accumulate(other.begin(), other.end(), false, op);
+  return std::accumulate(offspring.begin(), offspring.end(), false, op) || \
+         std::accumulate(other.begin(), other.end(), false, op) || \
+         pred(head) || \
+         pred(spouse);
 }
 
 // This is the global from test.cpp
@@ -265,6 +265,9 @@ Household::ContactTrace(const int& t,
   // This decision was deferred from TB::TreatmentBegin to this context.
   if (trace_kind == CTraceType::Vul && !HasVulnerable(t))
     return result;
+
+  n_contact_traces += 1;
+  result.did_visit  = true;
 
   if (head && head != idv && !head->dead && frac_screened.Sample(rng)) {
     result.screenings += 1;
