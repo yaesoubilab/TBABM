@@ -65,7 +65,6 @@ class TBABM {
 
       seed(_seed),
       rng(_seed),
-
       householdGen(householdsFile, 
           params,
           fileData,

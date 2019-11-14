@@ -1,5 +1,8 @@
 #include "../../include/TBABM/TB.h"
 
+// This is the global from test.cpp
+extern CTraceType trace_kind;
+
 // Marks an individual as having begun treatment.
 // Decides if they will complete treatment, or drop
 // out. Schedules either event.
@@ -8,7 +11,7 @@
 //
 // 'flag_override' prevents a TreatmentBegin event from being cancelled in
 // the event that the ORIGIN of the event was the contact-trace itself.
-  void
+void
 TB::TreatmentBegin(Time t, bool flag_override)
 {
   auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
@@ -91,10 +94,19 @@ TB::TreatmentBegin(Time t, bool flag_override)
     // Don't do contact tracing until 20 years. Also, don't do it if this
     // TreatmentBegin event is the result of a contact trace. This makes sense
     // in the case where contact tracing is limited to the household.
-    if (ts > 365*20 && // At least 2010
-        !flag_override && // This isn't part of an existing contact trace
-        params["TB_CT_frac_visit"].Sample(rng)) { // We're actually going
-                                                  // to visit the HH.
+    bool its_time {ts > 365*20};
+    bool selected {false};
+    
+    if (trace_kind == CTraceType::None)
+      selected = false;
+    else if (trace_kind == CTraceType::All)
+      selected = true;
+    else if (trace_kind == CTraceType::Vul)
+      selected = true; // NOTE: We defer this decision to the Household class.
+    else if (trace_kind == CTraceType::Prob)
+      selected = params["TB_CT_frac_visit"].Sample(rng);
+
+    if (its_time && !flag_override && selected) { // We're going to visit
       
       auto delay = 365*params["TB_CT_t_visit"].Sample(rng);
 

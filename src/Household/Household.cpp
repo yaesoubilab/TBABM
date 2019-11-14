@@ -241,6 +241,9 @@ Household::HasVulnerable(int t)
          std::accumulate(other.begin(), other.end(), false, op);
 }
 
+// This is the global from test.cpp
+extern CTraceType trace_kind;
+
 ContactTraceResult
 Household::ContactTrace(const int& t,
                         const shared_p<Individual> idv,
@@ -256,6 +259,12 @@ Household::ContactTrace(const int& t,
   result.screenings           = 0;
   result.screenings_hiv       = 0;
   result.screenings_children  = 0;
+
+  result.did_visit            = false;
+
+  // This decision was deferred from TB::TreatmentBegin to this context.
+  if (trace_kind == CTraceType::Vul && !HasVulnerable(t))
+    return result;
 
   if (head && head != idv && !head->dead && frac_screened.Sample(rng)) {
     result.screenings += 1;
