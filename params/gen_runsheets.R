@@ -8,6 +8,9 @@ library(tools, quietly=TRUE)
 library(jsonlite, quietly=TRUE, warn.conflicts=FALSE)
 library(optparse, quietly=TRUE)
 
+#####################################################
+## Error handling
+#####################################################
 tryInform <- function(code, message) {
   handleError <- function(c) {
     c$message <- paste0(c$message, "\n", '(', message, ')')
@@ -22,6 +25,9 @@ die <- function(message) {
   quit(status=1)
 }
 
+#####################################################
+## Argument processing
+#####################################################
 option_list <- list(
   make_option(c("-p", "--prior"),
               action="store_true",
@@ -38,6 +44,10 @@ option_list <- list(
 
 usage <- "%prog [options] PROTOTYPE_FILE RANGEFILE/PRIORFILE"
 description <- "Creates runsheets from either rangefiles or priorfiles"
+
+#####################################################
+## Specs for various input and output formats
+#####################################################
 
 # Spec for the RunSheet
 runsheet_spec <- cols(
@@ -68,6 +78,9 @@ rangefile_spec <- cols(
   step  = col_double()
 )
 
+#####################################################
+## Sampling functions
+#####################################################
 GenSamples <- function(input, n) {
   tp <- transpose(input) %>% setNames(input$name)
   map(tp, ~runif(n, .$min, .$max))
@@ -77,6 +90,10 @@ GenSamples_df <- function(GenSamples_output, n) {
   mutate(as_tibble(GenSamples_output), run.id=1:n) %>%
     select(run.id, everything())
 }
+
+#####################################################
+## Combinatorial code – for RangeFiles
+#####################################################
 
 # Cross all of the different parameter combinations together. The result of
 # this call is an unkeyed list of lists, where the innermost lists contain k-v
@@ -103,6 +120,10 @@ GenCombinations_df <- function(rangefile_fname) {
        mutate(run.id = seq(n())) %>%
        select(run.id, everything())
 }
+
+#####################################################
+## Code for generating runsheets
+#####################################################
 
 # Given a list of substitutions, outputs a new parameter sheet, as a tibble, which
 # includes these substitutions
@@ -152,6 +173,9 @@ GenRunSheets_pf <- function(proto_fname, priorfile_fname, n) {
        vs  = sampled)
 }
 
+#####################################################
+## Main function
+#####################################################
 main <- function(args) {
   parser <- OptionParser(option_list=option_list,
                          usage=usage,
