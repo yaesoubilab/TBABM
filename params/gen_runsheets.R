@@ -26,26 +26,6 @@ die <- function(message) {
 }
 
 #####################################################
-## Argument processing
-#####################################################
-option_list <- list(
-  make_option(c("-p", "--prior"),
-              action="store_true",
-              default=FALSE,
-              help="Create a collated runsheet from uniform prior distributions"),
-  make_option(c("-r", "--range"),
-              action="store_true",
-              default=FALSE,
-              help="Create a collated runsheet from the cartesian product of sequences"),
-  make_option(c("-n", "--num-samples"),
-              action="store",
-              default=0,
-              help="(-p only) Number of samples from joint prior"))
-
-usage <- "%prog [options] PROTOTYPE_FILE RANGEFILE/PRIORFILE"
-description <- "Creates runsheets from either rangefiles or priorfiles"
-
-#####################################################
 ## Specs for various input and output formats
 #####################################################
 
@@ -174,6 +154,32 @@ GenRunSheets_pf <- function(proto_fname, priorfile_fname, n) {
 }
 
 #####################################################
+## Argument processing
+#####################################################
+option_list <- list(
+  make_option(c("-p", "--prior"),
+              action="store_true",
+              default=FALSE,
+              help="Create a collated runsheet from uniform prior distributions"),
+  make_option(c("-r", "--range"),
+              action="store_true",
+              default=FALSE,
+              help="Create a collated runsheet from the cartesian product of sequences"),
+  make_option(c("-n", "--num-samples"),
+              action="store",
+              default=0,
+              help="(-p only) Number of samples from joint prior"),
+  make_option(c("-s", "--substitute"),
+              action="store_true",
+              default=FALSE,
+              help="Treat PROTOTYPE_FILE as a csv and create variants on each row using PRIORFILE Implies -p."))
+
+usage <- "%prog [options] PROTOTYPE_FILE RANGEFILE/PRIORFILE\n
+%prog -s [options] PROTOTYPE_FILE RUNSHEETS_FILE PRIORFILE"
+
+description <- "Creates runsheets from either rangefiles or priorfiles"
+
+#####################################################
 ## Main function
 #####################################################
 main <- function(args) {
@@ -185,13 +191,17 @@ main <- function(args) {
   opts <- parse_args(parser, args=args, positional_arguments=TRUE)$options
   args <- parse_args(parser, args=args, positional_arguments=TRUE)$args
 
+  if (opts$range & opts$substitute)
+    die("Can't specify -r and -s at the same time, for now")
+  if (opts$substitute && length(args) < 3)
+    die("-s flag requires three arguments. See -h")
   if (opts$prior & opts$range)
     die("Can't specify prior and range at the same time")
   if (! (opts$prior || opts$range))
     die("Must specifiy either -p or -rn")
   if (opts$prior && !opts$`num-samples`)
     die("When using -p, must specificy number of samples")
-  if (length(args) != 2)
+  if (!opts$substitute && length(args) != 2)
     die("Must specify PROTOTYPE_FILE RANGEFILE/PRIORFILE")
 
   proto_fname <- args[1]
@@ -219,7 +229,7 @@ main <- function(args) {
   if (opts$range)
     tryInform(write_csv(GenCombinations_df(file_fname), 'runsheets.csv'),
               "Writing of runsheet table failed")
-  else
+  else if (opts$prior)
     tryInform(write_csv(GenSamples_df(vs, opts$`num-samples`),
                         'runsheets.csv'),
               "Writing of runsheet table failed")
