@@ -7,6 +7,7 @@ suppressPackageStartupMessages(library(tidyverse, quietly=TRUE,
 library(tools, quietly=TRUE)
 library(jsonlite, quietly=TRUE, warn.conflicts=FALSE)
 library(optparse, quietly=TRUE)
+library(assertthat, quietly=TRUE)
 
 #####################################################
 ## Error handling
@@ -48,6 +49,11 @@ priorfile_spec <- cols(
   name  = col_character(),
   min   = col_double(),
   max   = col_double()
+)
+
+substitution_spec <- cols(
+  run.id   = col_character(),
+  .default = col_double()
 )
 
 # Spec for the rangefile
@@ -147,10 +153,48 @@ GenRunSheets_pf <- function(proto_fname, priorfile_fname, n) {
   proto  <- read_csv(proto_fname,     col_types=runsheet_spec)
   priors <- read_csv(priorfile_fname, col_types=priorfile_spec)
   
-  sampled <- GenSamples(priors, n)
+  GenRunSheets_pf_impl(proto, priors, n)
+}
+
+GenRunSheets_pf_impl <- function(proto, prior, n) {
+
+  sampled <- GenSamples(prior, n)
 
   list(dfs = map(pmap(sampled, list), GenRunSheet, proto),
        vs  = sampled)
+}
+
+# proto_fname, runsheets_fname, priorfile_fname -> 
+# 'proto_fname': The filename of a prototype runsheet
+#
+# 'runsheets_fname': The filename specifying the substitutions that have been
+#                    done to that runsheet. Aka, the .csv output of a previous
+#                    gen_params.R call without the '-s' flag.
+#
+# 'priorfile_fname': The priorfile used to produce variations on each runsheet
+#                    specified by the combo of 'proto_fname' and 'runsheets_fname'
+GenRunSheets_subst <- function(proto_fname, substitutions_fname, priorfile_fname, n=1) {
+
+  proto             <- read_csv(proto_fname,         col_types=runsheet_spec)
+  substitutions     <- read_csv(substitutions_fname, col_types=substitution_spec)
+  priors            <- read_csv(priorfile_fname,     col_types=priorfile_spec)
+
+  substituted <- map(transpose(substitutions), GenRunSheet, proto)
+  
+  final <- map(substituted, GenRunSheets_pf_impl, priors, n) %>% transpose %>% unlist
+
+  # reduce(final, ~list(append(.x$df, .y$df), append(.y, .y$df)))
+
+  print(substitutions)
+  print(priors)
+  print(n)
+
+  paste0("From a prototype of ", nrow(proto), " parameters, going to create ", nrow(substitutions), 
+         " runsheets, and then create ", nrow(substitutions), "x", n, " runsheets",
+         " through substitution of ", nrow(priors), " parameters") %>% print
+
+  print(substituted)
+  print(final)
 }
 
 #####################################################
@@ -191,6 +235,8 @@ main <- function(args) {
   opts <- parse_args(parser, args=args, positional_arguments=TRUE)$options
   args <- parse_args(parser, args=args, positional_arguments=TRUE)$args
 
+  if (opts$range & opts$prior)
+    die("Must specify -p flag when using -s")
   if (opts$range & opts$substitute)
     die("Can't specify -r and -s at the same time, for now")
   if (opts$substitute && length(args) < 3)
@@ -199,17 +245,23 @@ main <- function(args) {
     die("Can't specify prior and range at the same time")
   if (! (opts$prior || opts$range))
     die("Must specifiy either -p or -rn")
-  if (opts$prior && !opts$`num-samples`)
-    die("When using -p, must specificy number of samples")
+  if (opts$prior && identical(opts$`num-samples`, 0))
+    die("When using -p, must specify number of samples")
   if (!opts$substitute && length(args) != 2)
     die("Must specify PROTOTYPE_FILE RANGEFILE/PRIORFILE")
 
   proto_fname <- args[1]
   file_fname  <- args[2]
   
-  if (opts$range)
+  if (opts$substitute) {
+    runsheets <- GenRunSheets_subst(proto_fname, # the proto runsheet
+                                    file_fname,  # the runsheets we're substituting into
+                                    args[3],
+                                    opts$`num-samples`)     # the prior file we're using to drive the substition
+    die("Stopping execution here")
+  } else if (opts$range) {
     runsheets <- GenRunSheets_rf(proto_fname, file_fname)
-  else if (opts$prior) {
+  } else if (opts$prior) {
     runsheets <- GenRunSheets_pf(proto_fname,
                                  file_fname,
                                  opts$`num-samples`)
