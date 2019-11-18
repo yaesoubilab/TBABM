@@ -72,8 +72,10 @@ GenSamples <- function(input, n) {
   map(tp, ~runif(n, .$min, .$max))
 }
 
-GenSamples_df <- function(GenSamples_output, n) {
-  mutate(as_tibble(GenSamples_output), run.id=1:n) %>%
+GenSamples_df <- function(GenSamples_output) {
+  tbl <- as_tibble(GenSamples_output)
+
+  mutate(tbl, run.id=1:nrow(tbl)) %>%
     select(run.id, everything())
 }
 
@@ -167,7 +169,7 @@ GenRunSheets_pf_impl <- function(proto, prior, n) {
 # proto_fname, runsheets_fname, priorfile_fname -> 
 # 'proto_fname': The filename of a prototype runsheet
 #
-# 'runsheets_fname': The filename specifying the substitutions that have been
+# 'substitutions_fname': The filename specifying the substitutions that have been
 #                    done to that runsheet. Aka, the .csv output of a previous
 #                    gen_params.R call without the '-s' flag.
 #
@@ -179,22 +181,29 @@ GenRunSheets_subst <- function(proto_fname, substitutions_fname, priorfile_fname
   substitutions     <- read_csv(substitutions_fname, col_types=substitution_spec)
   priors            <- read_csv(priorfile_fname,     col_types=priorfile_spec)
 
-  substituted <- map(transpose(substitutions), GenRunSheet, proto)
+  # Take the prototype runsheet, perform all the substitutions that were asked
+  # for by the substitutions file
+  substituted_runsheets <- map(transpose(substitutions), GenRunSheet, proto)
   
-  final <- map(substituted, GenRunSheets_pf_impl, priors, n) %>% transpose %>% unlist
+  # For each one of these runsheets that have bene substituted, take 'n'
+  # samples from the prior and substitute each set of samples into a runsheet.
+  # Do this for every runsheet contained in 'substituted'
+  sampled <- map(substituted_runsheets, GenRunSheets_pf_impl, priors, n)
 
-  # reduce(final, ~list(append(.x$df, .y$df), append(.y, .y$df)))
+  # The last call returns a kind of ugly structure. We want the output of the
+  # function to be identical to GenRunSheets, for export reasons. So, here is 
+  # a bunch of black magic that does that.
+  final <- reduce(sampled,
+                  ~list(dfs=append(.x$dfs,  .y$dfs),
+                        vs=bind_rows(.x$vs, .y$vs)),
+                  .init=list(dfs=list(), vs=tibble()))
 
-  print(substitutions)
-  print(priors)
-  print(n)
+  # This^ approach depended on converting a list to an dataframe so that
+  # bind_rows could be used. Here, we convert the dataframe back to a list
+  # to maintain parity with the return value of GenRunSheets.
+  final$vs <- as.list(final$vs)
 
-  paste0("From a prototype of ", nrow(proto), " parameters, going to create ", nrow(substitutions), 
-         " runsheets, and then create ", nrow(substitutions), "x", n, " runsheets",
-         " through substitution of ", nrow(priors), " parameters") %>% print
-
-  print(substituted)
-  print(final)
+  final
 }
 
 #####################################################
@@ -257,8 +266,9 @@ main <- function(args) {
     runsheets <- GenRunSheets_subst(proto_fname, # the proto runsheet
                                     file_fname,  # the runsheets we're substituting into
                                     args[3],
-                                    opts$`num-samples`)     # the prior file we're using to drive the substition
-    die("Stopping execution here")
+                                    opts$`num-samples`)# the prior file we're using to drive the substition
+    vs        <- runsheets$vs
+    runsheets <- runsheets$dfs
   } else if (opts$range) {
     runsheets <- GenRunSheets_rf(proto_fname, file_fname)
   } else if (opts$prior) {
@@ -281,8 +291,8 @@ main <- function(args) {
   if (opts$range)
     tryInform(write_csv(GenCombinations_df(file_fname), 'runsheets.csv'),
               "Writing of runsheet table failed")
-  else if (opts$prior)
-    tryInform(write_csv(GenSamples_df(vs, opts$`num-samples`),
+  else if (opts$prior || opts$substitute)
+    tryInform(write_csv(GenSamples_df(vs),
                         'runsheets.csv'),
               "Writing of runsheet table failed")
 }
