@@ -238,7 +238,7 @@ function tbabm_coll () {
 
   mkdir $RUNNUM
 
-  TBABM_OPTS="-t $N_TRAJECTORIES -n $N_INDIVIDUALS -p $PARAMFILE -s $SEED -o $RUNNUM/ -m $N_THREADS -h household_structure.csv"
+  TBABM_OPTS="-t $N_TRAJECTORIES -n $N_INDIVIDUALS -p $PARAMFILE -s $SEED -o $RUNNUM/ -m $N_THREADS "
 
   $srun $TBABM_BIN $TBABM_OPTS > $RUNNUM/stdout.txt 2> $RUNNUM/stderr.txt
   
@@ -257,10 +257,10 @@ if [[ "$COLLATE" = "false" ]]; then
 else
   # Create the seeds for each trajectory
   NUM_INTS=$(wc -l < $COLLATED_FILE)
-  NUM_BYTES=$((8*NUM_INTS))
+  NUM_BYTES=$((4*NUM_INTS))
 
   head -c $NUM_BYTES /dev/urandom |
-    od -t u8 -An -w8 | # Request 8-bit unsigned integers, no radix, 8 bits per line
+    od -t u4 -An -w4 | # Request 4-byte unsigned integers, no radix, 4 bytes per line
     sed 's/ //g' > seeds.txt # Replace any spaces with nothing
 
   cat "$COLLATED_FILE" |

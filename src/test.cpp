@@ -337,7 +337,7 @@ int main(int argc, char **argv)
     else if (arg.first == "-y")
       constants["tMax"] = 365*static_cast<int>(arg.second.asLong());
     else if (arg.first == "-s" && arg.second)
-      timestamp = arg.second.asLong(); 
+      timestamp = static_cast<std::uint_fast64_t>(arg.second.asLong()); 
     else if (arg.first == "-m")
       pool_size = static_cast<int>(arg.second.asLong());
     else if (arg.first == "-o")
