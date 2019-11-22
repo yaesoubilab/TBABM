@@ -103,7 +103,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
       selected = true;
     else if (trace_kind == CTraceType::Vul)
       selected = true; // NOTE: We defer this decision to the Household class.
-    else if (trace_kind == CTraceType::Prob)
+    else if (trace_kind == CTraceType::Prob && its_time) // Avoid messing up RNG state
       selected = params["TB_CT_frac_visit"].Sample(rng);
 
     if (its_time && !flag_override && selected) { // We're going to visit
@@ -114,7 +114,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
       // Remember: have to capture the ContactTraceHandler because individual
       // might die, but we still want to CT his/her household
       eq.QuickSchedule(ts + delay, 
-        [this, lifetm, cth=ContactTraceHandler] (auto ts_, auto) -> bool {
+        [this, lifetm] (auto ts_, auto) -> bool {
 
         // Do NOT trace household if dead!! Memory errors...could develop a
         // workaround to this problem. Issue is that when the dead person is
@@ -125,7 +125,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
           return true;
 
         auto result = 
-          cth(ts_, params["TB_CT_frac_screened"], rng);
+          ContactTraceHandler(ts_, params["TB_CT_frac_screened"], rng);
 
         if (!result.did_visit)
           return true;
