@@ -94,7 +94,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
     // Don't do contact tracing until 20 years. Also, don't do it if this
     // TreatmentBegin event is the result of a contact trace. This makes sense
     // in the case where contact tracing is limited to the household.
-    bool its_time {ts > 365*20};
+    bool tracing_period_has_begun {ts > 365*20};
     bool selected {false};
     
     if (trace_kind == CTraceType::None)
@@ -103,10 +103,14 @@ TB::TreatmentBegin(Time t, bool flag_override)
       selected = true;
     else if (trace_kind == CTraceType::Vul)
       selected = true; // NOTE: We defer this decision to the Household class.
-    else if (trace_kind == CTraceType::Prob && its_time) // Avoid messing up RNG state
+    else if (trace_kind == CTraceType::IVul)
+      selected = (GetHIVStatus() == HIVStatus::Positive) || \
+                 (AgeStatus(ts) < 5);
+    else if (trace_kind == CTraceType::Prob && \
+             tracing_period_has_begun) // Avoid messing up RNG state
       selected = params["TB_CT_frac_visit"].Sample(rng);
 
-    if (its_time && !flag_override && selected) { // We're going to visit
+    if (tracing_period_has_begun && !flag_override && selected) { // We're going to visit
       
       auto delay = 365*params["TB_CT_t_visit"].Sample(rng);
 

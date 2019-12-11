@@ -282,10 +282,11 @@ Options:
   -o PATH    Dir for outputs. Include trailing slash. [default: .]
   -m NUM     Size of threadpool [default: 1]
   -h PATH    Location of households file. [default: household_structure.csv]
-  --ctrace=(none|all|vul|prob)  Type of contact tracing to perform
+  --ctrace=(none|all|vul|ivul|prob)  Type of contact tracing to perform
 
     all:  Always contact trace an index case's household
     vul:  Only contact trace vulnerable households (HIV+/<5yo)
+    ivul: Only contact trace households where _index_ is vulnerable
     prob: Use the probability given by "TB_CT_frac_visit" to decide whether to screen
 
   --version  Print version
@@ -349,6 +350,8 @@ int main(int argc, char **argv)
         trace_kind = CTraceType::All;
       else if (arg.second && arg.second.asString() == "vul")
         trace_kind = CTraceType::Vul; 
+      else if (arg.second && arg.second.asString() == "ivul")
+        trace_kind = CTraceType::IVul; 
       else if (arg.second && arg.second.asString() == "prob")
         trace_kind = CTraceType::Prob;
     }
