@@ -53,6 +53,10 @@ MasterData::MasterData(int tMax, int pLength, std::vector<double> ageBreaks) :
   tbTxNaiveAdults("tbTxNaiveAdults", tMax, pLength),
   tbTxNaiveInfectiousAdults("tbTxNaiveInfectiousAdults", tMax, pLength),
 
+  tbDeaths("tbDeaths", 0, tMax, pLength),
+  tbDeathsHIV("tbDeathsHIV", 0, tMax, pLength),
+  tbDeathsUnderFive("tbDeathsUnderFive", 0, tMax, pLength),
+
   ctHomeVisits("ctHomeVisits", 0, tMax, pLength),
   ctScreenings("ctScreenings", 0, tMax, pLength),
   ctScreeningsHIV("ctScreeningsHIV", 0, tMax, pLength),
@@ -122,6 +126,10 @@ MasterData::Close(void)
   tbTxExperiencedInfectiousAdults.Close();
   tbTxNaiveAdults.Close();
   tbTxNaiveInfectiousAdults.Close();
+
+  tbDeaths.Close();
+  tbDeathsHIV.Close();
+  tbDeathsUnderFive.Close();
 
   ctHomeVisits.Close();
   ctScreenings.Close();

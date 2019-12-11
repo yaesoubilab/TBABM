@@ -135,6 +135,12 @@ TB::HandleDeath(Time t)
     flag_date = -1;
   }
 
+  data.tbDeaths.Record(t, +1);
+  if (GetHIVStatus() == HIVStatus::Positive)
+    data.tbDeathsHIV.Record(t, +1);
+  if (AgeStatus(ts) < 5)
+    data.tbDeathsUnderFive.Record(t, +1);
+
   switch(tb_status) {
     case (TBStatus::Susceptible):
       data.tbSusceptible.Record(t, -1); break;

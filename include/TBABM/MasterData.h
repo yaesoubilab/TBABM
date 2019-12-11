@@ -70,6 +70,10 @@ class MasterData {
     PrevalenceTimeSeries<int> tbTxNaiveAdults;
     PrevalenceTimeSeries<int> tbTxNaiveInfectiousAdults;
 
+    IncidenceTimeSeries<int>  tbDeaths;
+    IncidenceTimeSeries<int>  tbDeathsHIV;
+    IncidenceTimeSeries<int>  tbDeathsUnderFive;
+
     IncidenceTimeSeries<int> ctHomeVisits;
     IncidenceTimeSeries<int> ctScreenings;
     IncidenceTimeSeries<int> ctScreeningsHIV;

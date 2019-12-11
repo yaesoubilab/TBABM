@@ -76,6 +76,10 @@ TimeSeriesExport<int> tbInTreatment;
 TimeSeriesExport<int> tbCompletedTreatment;
 TimeSeriesExport<int> tbDroppedTreatment;
 
+TimeSeriesExport<int> tbDeaths;
+TimeSeriesExport<int> tbDeathsHIV;
+TimeSeriesExport<int> tbDeathsUnderFive;
+
 TimeSeriesExport<int> ctHomeVisits;
 TimeSeriesExport<int> ctScreenings;
 TimeSeriesExport<int> ctScreeningsHIV;
@@ -164,6 +168,10 @@ bool ExportTrajectory(TBABM& t,
   success &= hivPositivePyramid.Add(     std::move(std::make_shared<decltype(data.hivPositivePyramid)>(data.hivPositivePyramid)), id);
   success &= tbExperiencedPyramid.Add(   std::move(std::make_shared<decltype(data.tbExperiencedPyr)>(data.tbExperiencedPyr)), id);
 
+  success &= tbDeaths.Add(   std::move(std::make_shared<decltype(data.tbDeaths)>(data.tbDeaths)), id);
+  success &= tbDeathsHIV.Add(   std::move(std::make_shared<decltype(data.tbDeathsHIV)>(data.tbDeathsHIV)), id);
+  success &= tbDeathsUnderFive.Add(   std::move(std::make_shared<decltype(data.tbDeathsUnderFive)>(data.tbDeathsUnderFive)), id);
+
   success &= ctHomeVisits.Add(std::move(           std::make_shared<decltype(data.ctHomeVisits)>(data.ctHomeVisits)), id);
   success &= ctScreenings.Add(std::move(           std::make_shared<decltype(data.ctScreenings)>(data.ctScreenings)), id);
   success &= ctScreeningsHIV.Add(std::move(        std::make_shared<decltype(data.ctScreeningsHIV)>(data.ctScreeningsHIV)), id);
@@ -240,6 +248,10 @@ bool WriteData(string outputPrefix)
       tbDroppedTreatment.Write(outputPrefix + "tbDroppedTreatment.csv")   &&   
 
       tbExperiencedPyramid.Write(outputPrefix + "tbExperiencedPyramid.csv") &&
+
+      tbDeaths.Write(outputPrefix + "tbDeaths.csv")   &&   
+      tbDeathsHIV.Write(outputPrefix + "tbDeathsHIV.csv")   &&   
+      tbDeathsUnderFive.Write(outputPrefix + "tbDeathsUnderFive.csv")   &&   
 
       ctHomeVisits.Write(outputPrefix + "ctHomeVisits.csv") &&
       ctScreenings.Write(outputPrefix + "ctScreenings.csv") &&
