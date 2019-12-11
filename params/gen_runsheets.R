@@ -4,10 +4,10 @@
 suppressPackageStartupMessages(library(tidyverse, quietly=TRUE, 
                    verbose=FALSE,
                    warn.conflicts=FALSE))
-library(tools, quietly=TRUE)
+library(tools, quietly=TRUE, warn.conflicts=FALSE)
 library(jsonlite, quietly=TRUE, warn.conflicts=FALSE)
-library(optparse, quietly=TRUE)
-library(assertthat, quietly=TRUE)
+library(optparse, quietly=TRUE, warn.conflicts=FALSE)
+library(assertthat, quietly=TRUE, warn.conflicts=FALSE)
 
 #####################################################
 ## Error handling
@@ -181,15 +181,18 @@ GenRunSheets_subst <- function(proto_fname, substitutions_fname, priorfile_fname
   substitutions     <- read_csv(substitutions_fname, col_types=substitution_spec)
   priors            <- read_csv(priorfile_fname,     col_types=priorfile_spec)
 
+  message("Performing substitutions on prototype_file")
   # Take the prototype runsheet, perform all the substitutions that were asked
   # for by the substitutions file
   substituted_runsheets <- map(transpose(substitutions), GenRunSheet, proto)
   
+  message("Performing uniform sampling from new prior on substituted runsheets")
   # For each one of these runsheets that have bene substituted, take 'n'
   # samples from the prior and substitute each set of samples into a runsheet.
   # Do this for every runsheet contained in 'substituted'
   sampled <- map(substituted_runsheets, GenRunSheets_pf_impl, priors, n)
 
+  message("Accumulating all runsheets")
   # The last call returns a kind of ugly structure. We want the output of the
   # function to be identical to GenRunSheets, for export reasons. So, here is 
   # a bunch of black magic that does that.
@@ -225,7 +228,11 @@ option_list <- list(
   make_option(c("-s", "--substitute"),
               action="store_true",
               default=FALSE,
-              help="Treat PROTOTYPE_FILE as a csv and create variants on each row using PRIORFILE Implies -p."))
+              help="Treat PROTOTYPE_FILE as a csv and create variants on each row using PRIORFILE Implies -p."),
+  make_option(c("-o", "--output-prefix"),
+              action="store",
+              default="runsheets",
+              help="Prefix of .csv,.json files to be output. Default is 'runsheets'"))
 
 usage <- "%prog [options] PROTOTYPE_FILE RANGEFILE/PRIORFILE\n
 %prog -s [options] PROTOTYPE_FILE RUNSHEETS_FILE PRIORFILE"
@@ -263,6 +270,7 @@ main <- function(args) {
   file_fname  <- args[2]
   
   if (opts$substitute) {
+    message("Generating runsheets")
     runsheets <- GenRunSheets_subst(proto_fname, # the proto runsheet
                                     file_fname,  # the runsheets we're substituting into
                                     args[3],
@@ -279,22 +287,33 @@ main <- function(args) {
     runsheets <- runsheets$dfs
   }
 
+  csvname  <- paste0(opts$`output-prefix`, '.csv')
+  jsonname <- paste0(opts$`output-prefix`, '.json')
+
   writer <- function(runsheet) {
     json <- toJSON(runsheet)
     write(json,
-          file="runsheets.json",
+          file=jsonname,
           append=TRUE)
   }
 
+  message("Generating .json from runsheets and writing to disk")
   tryInform(walk(runsheets, writer), "Writing of collated runsheet failed")
+  message("Finished writing json")
 
-  if (opts$range)
-    tryInform(write_csv(GenCombinations_df(file_fname), 'runsheets.csv'),
+  if (opts$range) {
+    message("Writing .csv to disk")
+    tryInform(write_csv(GenCombinations_df(file_fname), csvname),
               "Writing of runsheet table failed")
-  else if (opts$prior || opts$substitute)
+    message("Finished writing .csv")
+  }
+  else if (opts$prior || opts$substitute) {
+    message("Writing .csv to disk")
     tryInform(write_csv(GenSamples_df(vs),
-                        'runsheets.csv'),
+                        csvname),
               "Writing of runsheet table failed")
+    message("Finished writing .csv")
+  }
 }
 
 main(commandArgs(trailingOnly=TRUE))
