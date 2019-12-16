@@ -94,7 +94,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
     // Don't do contact tracing until 20 years. Also, don't do it if this
     // TreatmentBegin event is the result of a contact trace. This makes sense
     // in the case where contact tracing is limited to the household.
-    bool tracing_period_has_begun {ts > 365*20};
+    bool tracing_period_has_begun {ts > 365*30};
     bool selected {false};
     
     if (trace_kind == CTraceType::None)
