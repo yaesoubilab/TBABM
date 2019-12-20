@@ -266,6 +266,9 @@ Household::ContactTrace(const int& t,
   if (trace_kind == CTraceType::Vul && !HasVulnerable(t))
     return result;
 
+  if (!can_trace) // The "TB_CT_frac_visit" mechanism
+    return result;
+
   n_contact_traces += 1;
   result.did_visit  = true;
 

@@ -53,7 +53,8 @@ EventFunc TBABM::Marriage(weak_p<Individual> m_weak, weak_p<Individual> f_weak)
         // Couple forms new household?
         if (params["coupleFormsNewHousehold"].Sample(rng) == 1) {
           auto hid = nHouseholds++;
-          households[hid] = std::make_shared<Household>(t, hid);
+          bool can_trace = params["TB_CT_frac_visit"].Sample(rng);
+          households[hid] = std::make_shared<Household>(t, hid, can_trace);
 
           ChangeHousehold(m, t, hid, HouseholdPosition::Head);
           ChangeHousehold(f, t, hid, HouseholdPosition::Spouse);

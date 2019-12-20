@@ -25,8 +25,8 @@ TB::TreatmentBegin(Time t, bool flag_override)
     if (!AliveStatus())
       return true;
 
-    // Don't begin treatment it was begun in the past becasue of a contact
-    // trace.
+    // Don't begin treatment if another TreatmentBegin event fired earlier,
+    // due to a contact trace.
     if (flag_contact_traced && !flag_override) {
      
       data.ctInfectiousnessAverted(ts - flag_date);
@@ -38,7 +38,7 @@ TB::TreatmentBegin(Time t, bool flag_override)
     }
 
     if (flag_contact_traced && flag_override) {
-      // No-op
+      // Proceed! But don't contact trace.
     }
 
     if (tb_status != TBStatus::Infectious) {
@@ -99,16 +99,17 @@ TB::TreatmentBegin(Time t, bool flag_override)
     
     if (trace_kind == CTraceType::None)
       selected = false;
-    else if (trace_kind == CTraceType::All)
-      selected = true;
     else if (trace_kind == CTraceType::Vul)
       selected = true; // NOTE: We defer this decision to the Household class.
     else if (trace_kind == CTraceType::IVul)
       selected = (GetHIVStatus() == HIVStatus::Positive) || \
                  (AgeStatus(ts) < 5);
-    else if (trace_kind == CTraceType::Prob && \
-             tracing_period_has_begun) // Avoid messing up RNG state
-      selected = params["TB_CT_frac_visit"].Sample(rng);
+    else if (trace_kind == CTraceType::Prob)
+      selected = true;
+    else {
+      printf("Error: unsupported CTraceType in event-TreatmentBegin-inl.h");
+      exit(1);
+    }
 
     if (tracing_period_has_begun && !flag_override && selected) { // We're going to visit
       
@@ -147,7 +148,9 @@ TB::TreatmentBegin(Time t, bool flag_override)
         return true;
       });
 
-    } else if (ts > 365*20 && !flag_override) { // Not going to trace
+    } else if (tracing_period_has_begun && flag_override) {
+      // Not going to trace, because this Tx-init is happening because of a 
+      // contact-trace.
       // printf("Not going to trace\n");
     }
 

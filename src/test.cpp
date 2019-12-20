@@ -294,12 +294,12 @@ Options:
   -o PATH    Dir for outputs. Include trailing slash. [default: .]
   -m NUM     Size of threadpool [default: 1]
   -h PATH    Location of households file. [default: household_structure.csv]
-  --ctrace=(none|all|vul|ivul|prob)  Type of contact tracing to perform
+  --ctrace=(none|vul|ivul|prob)  Type of contact tracing to perform
 
-    all:  Always contact trace an index case's household
-    vul:  Only contact trace vulnerable households (HIV+/<5yo)
-    ivul: Only contact trace households where _index_ is vulnerable
-    prob: Use the probability given by "TB_CT_frac_visit" to decide whether to screen
+    vul:  Only attempt to contact trace vulnerable households (HIV+/<5yo)
+    ivul: Only attempt to contact trace households where _index_ is vulnerable
+    prob: No predicates on screening, except whether the household can be 
+          screened (this is governed by "TB_CT_frac_visit")
 
   --version  Print version
 )";
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
     = docopt::docopt(USAGE,
                      { argv+1, argv+argc },
                      true,                  // show help if requested
-                     "TBABM 0.6.7-alpha2"); // version string
+                     "TBABM 0.7.1"); // version string
 
   // for (auto const& arg : args) {
   //   std::cout << arg.first << arg.second << std::endl;

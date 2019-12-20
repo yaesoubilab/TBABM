@@ -8,7 +8,8 @@ shared_p<Household>
 HouseholdGen::GetHousehold(const int current_time, const int hid, RNG& rng)
 {
   // Create a blank Household object
-  auto household = std::make_shared<Household>(current_time, hid);
+  bool can_trace = params["TB_CT_frac_visit"].Sample(rng);
+  auto household = std::make_shared<Household>(current_time, hid, can_trace);
 
   // Retrieve the corresponding vector
   size_t size = families.size();

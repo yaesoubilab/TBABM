@@ -25,6 +25,7 @@ class Household {
     void PrintHousehold(int t);
 
     int n_contact_traces = 0;
+    bool can_trace = false;
 
     // Right now, these functions mean the same thing,
     // and 't' is not used.
@@ -62,12 +63,14 @@ class Household {
         std::vector<shared_p<Individual>> offspring,
         std::vector<shared_p<Individual>> other,
         int t,
-        int hid) : 
+        int hid,
+        bool can_trace) : 
       head(head), 
       spouse(spouse), 
       offspring(offspring), 
       other(other),
       hid(hid),
+      can_trace(can_trace),
       nInfectiousTBIndivduals(0) {
 
         nIndividuals = (head?1:0) + 
@@ -84,8 +87,8 @@ class Household {
           AddIndividual(idv, t, HouseholdPosition::Other);
       }
 
-    Household(int t, int hid) : 
-      Household({}, {}, {}, {}, t, hid) {}
+    Household(int t, int hid, bool can_trace) : 
+      Household({}, {}, {}, {}, t, hid, can_trace) {}
 
   private:
     int hid;

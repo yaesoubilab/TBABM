@@ -35,7 +35,10 @@ EventFunc TBABM::CreateHousehold(weak_p<Individual> head_w,
       for (auto idv : other_w)
         other.emplace_back(idv.lock());
 
-      auto household = std::make_shared<Household>(head, spouse, offspring, other, t, hid);
+      bool can_visit = params["TB_CT_frac_visit"].Sample(rng);
+
+      auto household = std::make_shared<Household>(head, spouse, offspring, \
+          other, t, hid, can_visit);
       households[hid] = household;
 
       ChangeHousehold(head, t, hid, HouseholdPosition::Head);
