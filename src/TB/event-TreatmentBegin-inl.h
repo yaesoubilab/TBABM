@@ -12,13 +12,12 @@ extern CTraceType trace_kind;
 // 'flag_override' prevents a TreatmentBegin event from being cancelled in
 // the event that the ORIGIN of the event was the contact-trace itself.
 void
-TB::TreatmentBegin(Time t, bool flag_override)
+TB::TreatmentBegin(Time t, const bool flag_override)
 {
   auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
                 (auto ts_, auto) -> bool {
 
     assert(lifetm);
-    assert(tb_treatment_status != TBTreatmentStatus::Incomplete);
 
     auto ts = static_cast<int>(ts_);
 
@@ -47,6 +46,11 @@ TB::TreatmentBegin(Time t, bool flag_override)
              (int)flag_override);
       return true;
     }
+
+    // Don't try to begin TB treatment if the individual is already in 
+    // treatment.
+    if (tb_treatment_status == TBTreatmentStatus::Incomplete)
+      return true;
 
     // Log(ts, "TB treatment begin");
 
@@ -105,19 +109,17 @@ TB::TreatmentBegin(Time t, bool flag_override)
       selected = (GetHIVStatus() == HIVStatus::Positive) || \
                  (AgeStatus(ts) < 5);
     else if (trace_kind == CTraceType::Prob)
-      selected = true;
+      selected = true;  // NOTE: We defer this decision to the Household class.
     else {
       printf("Error: unsupported CTraceType in event-TreatmentBegin-inl.h");
       exit(1);
     }
 
-    if (tracing_period_has_begun && !flag_override && selected) { // We're going to visit
+    if (tracing_period_has_begun && !flag_override && selected) {
       
       auto delay = 365*params["TB_CT_t_visit"].Sample(rng);
 
       // Schedule a contact trace
-      // Remember: have to capture the ContactTraceHandler because individual
-      // might die, but we still want to CT his/her household
       eq.QuickSchedule(ts + delay, 
         [this, lifetm] (auto ts_, auto) -> bool {
 

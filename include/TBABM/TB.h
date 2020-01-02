@@ -140,7 +140,7 @@ class TB
     // flag, which should only be set by the ContactTrace function.
     // The default, 'false' is correct behaviour in the case that the
     // treatment is being initiated by 'InfectInfectious'
-    void TreatmentBegin(Time, bool flag_override = false);
+    void TreatmentBegin(Time, const bool flag_override = false);
 
     void TreatmentMarkExperienced(Time, bool flag_override = false);
 
