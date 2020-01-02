@@ -25,7 +25,7 @@ enum class StrainType {Unspecified};
 
 enum class RecoveryType {Natural, Treatment};
 
-enum class CTraceType {None, All, Vul, IVul, Prob};
+enum class CTraceType {None, Vul, IVul, Prob};
 
 typedef struct TBHistoryItem {
   int t_infection;

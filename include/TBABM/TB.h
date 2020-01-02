@@ -79,7 +79,7 @@ class TB
     bool PreviouslyTreated(void);
 
     void SetHouseholdCallbacks(
-        function<ContactTraceResult(const Time&, Param&, RNG&)> contactTrace,
+        function<ContactTraceResult(const Time&, Param&, Param&, RNG&)> contactTrace,
         function<void(Time)> progression, 
         function<void(Time)> recovery,
         function<double(void)> householdPrevalence,
@@ -220,6 +220,6 @@ class TB
 
     function<void(Time)> DeathHandler;   
     function<void(Time)> ProgressionHandler;
-    function<ContactTraceResult(const Time&, Param&, RNG&)>  ContactTraceHandler;
+    function<ContactTraceResult(const Time&, Param&, Param&, RNG&)>  ContactTraceHandler;
     function<void(Time)> RecoveryHandler;
 };

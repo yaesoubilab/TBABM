@@ -31,7 +31,7 @@ TB::GetHIVType(Time t)
 
   void
 TB::SetHouseholdCallbacks(
-  function<ContactTraceResult(const Time&, Param&, RNG&)> contactTrace,
+  function<ContactTraceResult(const Time&, Param&, Param&, RNG&)> contactTrace,
   function<void(Time)>       progression, 
   function<void(Time)>       recovery,
   function<double(void)>     householdPrevalence,

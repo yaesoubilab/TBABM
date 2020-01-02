@@ -24,6 +24,7 @@ class Household {
 
     void PrintHousehold(int t);
 
+    bool can_trace = false;
     int n_contact_traces = 0;
 
     // Right now, these functions mean the same thing,
@@ -55,6 +56,7 @@ class Household {
     ContactTrace(const int& t,
                  const shared_p<Individual> idv,
                  Param& frac_screened,
+                 Param& frac_visited,
                  RNG& rng);
 
     Household(shared_p<Individual> head,

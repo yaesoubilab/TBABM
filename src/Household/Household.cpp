@@ -64,8 +64,9 @@ void Household::AddIndividual(shared_p<Individual> idv, int t, HouseholdPosition
   idv->tb.SetHouseholdCallbacks(
     [this, idv] (const int& t,
                  Param& frac_screened,
+                 Param& frac_visited,
                  RNG& rng) -> ContactTraceResult {
-      return ContactTrace(t, idv, frac_screened, rng);
+      return ContactTrace(t, idv, frac_screened, frac_visited, rng);
     },
 
     [this, idv] (int t) -> void   { nInfectiousTBIndivduals += 1;
@@ -248,6 +249,7 @@ ContactTraceResult
 Household::ContactTrace(const int& t,
                         const shared_p<Individual> idv,
                         Param& frac_screened,
+                        Param& frac_visited,
                         RNG& rng) {
 
   ContactTraceResult result;
@@ -264,6 +266,14 @@ Household::ContactTrace(const int& t,
 
   // This decision was deferred from TB::TreatmentBegin to this context.
   if (trace_kind == CTraceType::Vul && !HasVulnerable(t))
+    return result;
+
+  if (n_contact_traces == 0)
+    can_trace = frac_visited.Sample(rng);
+
+  // Determine whether the house is "reachable." Note that, as implemented,
+  // the concept of reachability applies to ALL contact-tracing scenarios.
+  if (!can_trace)
     return result;
 
   n_contact_traces += 1;
