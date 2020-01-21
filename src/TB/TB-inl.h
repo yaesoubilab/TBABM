@@ -100,6 +100,12 @@ TB::InternalDeathHandler(Time t)
       return true;
     }
     
+    data.tbDeaths.Record(ts, +1);
+    if (GetHIVStatus() == HIVStatus::Positive)
+      data.tbDeathsHIV.Record(ts, +1);
+    if (AgeStatus(ts) < 5)
+      data.tbDeathsUnderFive.Record(ts, +1);
+
     // Otherwise, schedule the death for time 't'.
     DeathHandler(ts);
 
@@ -112,34 +118,12 @@ TB::InternalDeathHandler(Time t)
 // This function is called by Individual AFTER death is assured to happen.
 // The above function is used to check the contact-tracing flag BEFORE a 
 // death is assured to happen.
-  void
+void
 TB::HandleDeath(Time t)
 {
   bool adult = AgeStatus(t) >= 15;
 
   auto ts = static_cast<int>(t);
-
-  if (flag_contact_traced) {
-    assert(flag_date != -1);
-
-    data.ctDeathsAverted.Record(t, +1);
-    
-    if (GetHIVStatus() == HIVStatus::Positive)
-      data.ctDeathsAvertedHIV.Record(ts, +1);
-    if (AgeStatus(t) < 5)
-      data.ctDeathsAvertedChildren.Record(ts, +1);
-      
-    data.ctInfectiousnessAverted(ts - flag_date);
-
-    flag_contact_traced = false;
-    flag_date = -1;
-  }
-
-  data.tbDeaths.Record(t, +1);
-  if (GetHIVStatus() == HIVStatus::Positive)
-    data.tbDeathsHIV.Record(t, +1);
-  if (AgeStatus(ts) < 5)
-    data.tbDeathsUnderFive.Record(t, +1);
 
   switch(tb_status) {
     case (TBStatus::Susceptible):
@@ -157,8 +141,6 @@ TB::HandleDeath(Time t)
         data.tbInfectious.Record(t, -1);
 
       data.tbExperienced.Record(t, -1); break;
-
-      break;
 
     default: std::cout << "Error: UNSUPPORTED TBStatus!" << std::endl;
   }

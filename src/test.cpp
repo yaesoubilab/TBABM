@@ -361,6 +361,10 @@ int main(int argc, char **argv)
         trace_kind = CTraceType::IVul; 
       else if (arg.second && arg.second.asString() == "prob")
         trace_kind = CTraceType::Prob;
+      else {
+        printf("Error: Illegal value for --ctrace\n");
+        exit(EXIT_FAILURE);
+      }
     }
   }
 
