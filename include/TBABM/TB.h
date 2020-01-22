@@ -177,7 +177,7 @@ class TB
                         // (when the last individual began Tx after being id'd
                         // by a contact-trace intervention
 
-    double risk_window; // How many days in between evals for LTB. unit: [days]
+    const double risk_window; // How many days in between evals for LTB. unit: [days]
     int risk_window_id; // The "ID" of the window. Incremented on change in
                         // household prevalence.
 

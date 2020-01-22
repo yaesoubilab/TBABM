@@ -42,8 +42,10 @@ TB::Recovery(Time t, RecoveryType r, bool flag_override)
     if (RecoveryHandler && r == RecoveryType::Natural)
       RecoveryHandler(ts);
 
+    risk_window_id += 1;
+    
     // Set up periodic evaluation for reinfection
-    InfectionRiskEvaluate(ts, risk_window, std::move(l_ptr));
+    InfectionRiskEvaluate(ts, risk_window_id, std::move(l_ptr));
 
     // Set up one-time sample for reactivation
     InfectLatent(ts, 

@@ -80,6 +80,7 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
   // If they do get infected, this is what the infection source is. Note: During 'seeding'
   // (0 < t < risk_window) all infection is from the community/global
   Source infection_source {tti_global < tti_household ? Source::Global : Source::Household};
+
   if (init_infection)
     infection_source = Source::Global;
 

@@ -16,8 +16,6 @@ TB::RiskReeval(Time t)
     if (ts < risk_window)
       return true;
 
-    auto old_risk_window = risk_window;
-
     // Log(ts, "TB: RiskReeval triggered");
 
     // CONDITIONS THAT MAY CHANGE RISK WINDOW

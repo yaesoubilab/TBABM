@@ -25,7 +25,7 @@ TB::InfectInfectious(Time t, Source s, StrainType)
     // (this could happen in the case that an individual is
     // re-activating right now - it shouldn't be possible for
     // them to develop a re-infection)
-    risk_window += 1;
+    risk_window_id += 1;
 
     if (tb_status == TBStatus::Latent)
       data.tbLatent.Record(ts, -1);
