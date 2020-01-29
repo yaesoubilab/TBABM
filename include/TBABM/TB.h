@@ -140,7 +140,10 @@ class TB
     // flag, which should only be set by the ContactTrace function.
     // The default, 'false' is correct behaviour in the case that the
     // treatment is being initiated by 'InfectInfectious'
-    void TreatmentBegin(Time, const bool flag_override = false);
+    using FastTraceT = enum class FastTraceT { Lead, Lag, None };
+    void TreatmentBegin(Time,
+                        const bool flag_override = false,
+                        const FastTraceT flag_fasttrace = FastTraceT::None);
 
     void TreatmentMarkExperienced(Time, bool flag_override = false);
 

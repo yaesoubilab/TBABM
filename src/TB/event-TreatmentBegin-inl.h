@@ -12,9 +12,12 @@ extern CTraceType trace_kind;
 // 'flag_override' prevents a TreatmentBegin event from being cancelled in
 // the event that the ORIGIN of the event was the contact-trace itself.
 void
-TB::TreatmentBegin(Time t, const bool flag_override)
+TB::TreatmentBegin(Time t,
+                   const bool flag_override,
+                   const FastTraceT flag_fasttrace)
 {
-  auto lambda = [this, flag_override, lifetm = GetLifetimePtr()]
+  auto lambda = [this, flag_override, flag_fasttrace,
+                 lifetm = GetLifetimePtr()]
                 (auto ts_, auto) -> bool {
 
     assert(lifetm);
@@ -24,6 +27,14 @@ TB::TreatmentBegin(Time t, const bool flag_override)
     if (!AliveStatus())
       return true;
 
+    // Don't allow the leader of a Fast Trace to proceed if the tracing
+    // period hasn't begun.
+    if (ts < 365*20 && flag_fasttrace == FastTraceT::Lead)
+      return true;
+
+    if (flag_fasttrace == FastTraceT::Lead && trace_kind == CTraceType::None)
+      return true;
+    
     // Don't begin treatment if another TreatmentBegin event fired earlier,
     // due to a contact trace.
     if (flag_contact_traced && !flag_override) {

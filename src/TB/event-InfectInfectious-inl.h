@@ -103,8 +103,11 @@ TB::InfectInfectious(Time t, Source s, StrainType)
       InternalDeathHandler(ts + 365*timeToDeath);
 
     // Individual seeks out treatment
-    else if (winner == timeToSeekingTreatment)
-      TreatmentBegin(ts + 365*timeToSeekingTreatment);
+    else if (winner == timeToSeekingTreatment) {
+      // Preempting the next event, flag_fasttrace==true
+      TreatmentBegin(ts, false, FastTraceT::Lead); 
+      TreatmentBegin(ts + 365*timeToSeekingTreatment, false, FastTraceT::Lag);
+    }
 
     // Something bad happened
     else {
