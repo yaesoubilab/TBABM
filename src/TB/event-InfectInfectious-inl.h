@@ -19,6 +19,10 @@ TB::InfectInfectious(Time t, Source s, StrainType)
     if (tb_status == TBStatus::Infectious)
       return true;
 
+    // Part of 'extreme-tracing-immunity' experiment
+    if (immune)
+      return true;
+
     // Log(ts, "TB infection: Infectious");
 
     // Prevent InfectionRiskEvaluate from continuing to run

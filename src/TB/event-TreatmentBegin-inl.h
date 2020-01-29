@@ -148,6 +148,8 @@ TB::TreatmentBegin(Time t, const bool flag_override)
         data.ctScreeningsHIV.Record(ts_,      result.screenings_hiv);
         data.ctScreeningsChildren.Record(ts_, result.screenings_children);
 
+        immune = true;
+
         return true;
       });
 

@@ -14,6 +14,8 @@ TB::ContactTrace(Time t)
   flag_contact_traced = true;
   flag_date = static_cast<int>(t);
 
+  immune=true;
+
   TreatmentBegin(t, true); // Individual immediately begins treatment
 
   return 1;

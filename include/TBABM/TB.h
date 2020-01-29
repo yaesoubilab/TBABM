@@ -197,6 +197,11 @@ class TB
 
     int init_time;
 
+    // Whether or not the individual is "immune" to active TB. Used on the
+    // 'extreme-tracing-immunity' branch to simulate a contact-tracing
+    // intervention.
+    bool immune = false;
+
     MasterData& data; // Where all the references to timeseries data live
 
     //////////////////////////////////////////////////////////////////////////
