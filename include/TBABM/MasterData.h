@@ -43,8 +43,11 @@ class MasterData {
     IncidenceTimeSeries<int>  tbIncidence;   // Individuals transitioning from L to I
     IncidenceTimeSeries<int>  tbRecoveries;  // Individuals transitioning from I to L
 
-    IncidenceTimeSeries<int>  tbInfectionsHousehold; // Individuals infected by household member
-    IncidenceTimeSeries<int>  tbInfectionsCommunity; // Individuals infected by community
+    // Individuals infected by household member (transitioning from L to I)
+    IncidenceTimeSeries<int>  tbInfectionsHousehold; 
+    
+    // Individuals infected by community (transitioning from L to I)
+    IncidenceTimeSeries<int>  tbInfectionsCommunity; 
 
     PrevalenceTimeSeries<int> tbSusceptible; // # Individuals in S
     PrevalenceTimeSeries<int> tbLatent;      // # Individuals in L

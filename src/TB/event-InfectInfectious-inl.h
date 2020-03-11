@@ -7,7 +7,7 @@
 void
 TB::InfectInfectious(Time t, Source s, StrainType)
 {
-  auto lambda = [this, lifetm = GetLifetimePtr()] (auto ts_, auto) {
+  auto lambda = [this, s, lifetm = GetLifetimePtr()] (auto ts_, auto) {
     auto ts = static_cast<int>(ts_);
 
     assert(lifetm);
@@ -34,6 +34,12 @@ TB::InfectInfectious(Time t, Source s, StrainType)
 
     data.tbInfectious.Record(ts, +1);
     data.tbIncidence.Record(ts, +1);
+
+    if (s == Source::Global)
+      data.tbInfectionsCommunity.Record(ts, +1);
+    else if (s == Source::Household)
+      data.tbInfectionsHousehold.Record(ts, +1);
+
 
     if (treatment_experienced && \
         AgeStatus(ts) >= 15)

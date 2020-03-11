@@ -32,11 +32,6 @@ TB::InfectLatent(Time t, Source source, StrainType strain)
     if (tb_status != TBStatus::Latent)
       data.tbLatent.Record(ts, +1);
 
-    if (source == Source::Global)
-      data.tbInfectionsCommunity.Record(ts, +1);
-    else if (source == Source::Household)
-      data.tbInfectionsHousehold.Record(ts, +1);
-
     // Mark as latently infected
     tb_status = TBStatus::Latent;
 
