@@ -33,7 +33,10 @@ calibrationData_raw <- tibble::tibble(
   prevalenceHIV = c(0.052, NA, NA, NA, NA, NA, NA),
   prevalenceExperiencedAdults = c(0.097, NA, NA, NA, NA, NA, NA),
   prevalenceInfectiousNaiveAdults = c(0.0051, NA, NA, NA, NA, NA, NA),
-  prevalenceInfectiousExperiencedAdults = c(0.0299, NA, NA, NA, NA, NA, NA)
+  prevalenceInfectiousExperiencedAdults = c(0.0299, NA, NA, NA, NA, NA, NA),
+  prevalenceInfectiousHouseholdContacts = c(0.031, NA, NA, NA, NA, NA, NA),
+  prevalenceInfectiousHouseholdContactsUnder5
+                                        = c(0.10, NA, NA, NA, NA, NA, NA),
 )
 
 calibrationData <- ReformatRawCalibData(calibrationData_raw)
@@ -83,10 +86,27 @@ tar_prev_inf_exp_adults <-
        observed=calibrationData$prevalenceInfectiousExperiencedAdults,
        size=338)
 
-targets <- list(HIVPrevalence =         tar_prevalence_HIV,
-                ExperiencedAdults =     tar_prev_exp_adults,
-                NaiveInfectiousAdults = tar_prev_inf_naive_adults,
-                ExpInfectiousAdults =   tar_prev_inf_exp_adults)
+tar_prev_inf_household_contacts <-
+  list(type='TS',
+       model=c('activeHouseholdContacts', 'totalHouseholdContacts'),
+       observed=calibrationData$prevalenceInfectiousHouseholdContacts,
+       size='model')
+
+tar_prev_inf_household_contacts_under5 <-
+  list(type='TS',
+       model=c('activeHouseholdContactsUnder5', 'totalHouseholdContactsUnder5'),
+       observed=calibrationData$prevalenceInfectiousHouseholdContactsUnder5,
+       size='model')
+
+targets <- list(NotifiedTBChildren =        tar_notif_tb_children,
+                NotifiedTBExpAdults =       tar_notif_tb_exp_adults,
+                NotifiedTBNaiveAdults =     tar_notif_tb_naive_adults,
+                HIVPrevalence =             tar_prevalence_HIV,
+                ExperiencedAdults =         tar_prev_exp_adults,
+                NaiveInfectiousAdults =     tar_prev_inf_naive_adults,
+                ExpInfectiousAdults =       tar_prev_inf_exp_adults,
+                ActiveHouseholdContacts   = tar_prev_inf_household_contacts,
+                ActiveHouseholdContactsU5 = tar_prev_inf_household_contacts_under5)
 
 #########################################################
 ## Error handling
