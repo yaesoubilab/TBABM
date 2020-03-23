@@ -64,13 +64,20 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
       reduction = 1-params["TB_risk_reduction_badHIV"].Sample(rng);
   }
    
+  long double under5_extrarisk {AgeStatus(t) < 5 ? \
+                                params["TB_under5_scalar"].Sample(rng) : \
+                                1};
+
   // Calculate size of risk from the community, and size of risk from the 
   // household. "TB_risk_global" and "TB_risk_household" are constants, despite
   // the fact that a .Sample method is called on them.
-  long double risk_global     {reduction * \
+  long double risk_global     {under5_extrarisk * \
+                               reduction * \
                                GlobalTBPrevalence(t) * \
                                params["TB_risk_global"].Sample(rng)};
-  long double risk_household  {reduction * \
+
+  long double risk_household  {under5_extrarisk * \
+                               reduction * \
                                ContactHouseholdTBPrevalence(tb_status) * \
                                params["TB_risk_household"].Sample(rng)};
 
