@@ -68,7 +68,10 @@ MasterData::MasterData(int tMax, int pLength, std::vector<double> ageBreaks) :
   ctDeathsAvertedHIV("ctDeathsAvertedHIV", 0, tMax, pLength),
   ctDeathsAvertedChildren("ctDeathsAvertedChildren", 0, tMax, pLength),
   
-  activeHouseholdContacts("activeHouseholdContacts"),
+  activeHouseholdContacts("activeHouseholdContacts", 0, tMax, pLength),
+  activeHouseholdContactsUnder5("activeHouseholdContactsUnder5", 0, tMax, pLength),
+  totalHouseholdContacts("totalHouseholdContacts", 0, tMax, pLength),
+  totalHouseholdContactsUnder5("totalHouseholdContactsUnder5", 0, tMax, pLength),
 
   pyramid("Population pyramid", 0, tMax, pLength, 2, ageBreaks),
   deathPyramid("Death pyramid", 0, tMax, pLength, 2, ageBreaks),
@@ -145,6 +148,11 @@ MasterData::Close(void)
   tbInTreatment.Close();
   tbCompletedTreatment.Close();
   tbDroppedTreatment.Close();
+
+  activeHouseholdContacts.Close();
+  activeHouseholdContactsUnder5.Close();
+  totalHouseholdContacts.Close();
+  totalHouseholdContactsUnder5.Close();
 
   return;
 }

@@ -83,7 +83,9 @@ class TB
         function<void(Time)> progression, 
         function<void(Time)> recovery,
         function<double(void)> householdPrevalence,
-        function<double(TBStatus)> contactHouseholdPrevalence);
+        function<double(TBStatus)> contactHouseholdPrevalence,
+        function<int(int, int)> householdTBCases,
+        function<int(int, int)> householdSize);
     void ResetHouseholdCallbacks(void);
 
     void InitialEvents(void);
@@ -211,6 +213,8 @@ class TB
     function<double(Time)> GlobalTBPrevalence;
     function<double(void)> HouseholdTBPrevalence;
     function<double(TBStatus)> ContactHouseholdTBPrevalence;
+    function<int(int maxage, int t)> HouseholdTBCases;
+    function<int(int maxage, int t)> HouseholdSize;
 
     function<shared_p<TB>(void)> GetLifetimePtr;
 

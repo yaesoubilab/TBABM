@@ -91,6 +91,11 @@ TimeSeriesExport<int> ctDeathsAverted;
 TimeSeriesExport<int> ctDeathsAvertedHIV;
 TimeSeriesExport<int> ctDeathsAvertedChildren;
 
+TimeSeriesExport<int> activeHouseholdContacts;
+TimeSeriesExport<int> activeHouseholdContactsUnder5;
+TimeSeriesExport<int> totalHouseholdContacts;
+TimeSeriesExport<int> totalHouseholdContactsUnder5;
+
 PyramidTimeSeriesExport pyramid;
 PyramidTimeSeriesExport deathPyramid;
 PyramidTimeSeriesExport hivInfectionsPyramid;
@@ -104,7 +109,6 @@ map<TimeStatType, string> columns {
     {TimeStatType::Max,  "Maximum"}
 };
 
-TimeStatisticsExport activeHouseholdContacts(columns);
 
 bool ExportTrajectory(TBABM& t, 
     std::uint_fast64_t i, 
@@ -188,7 +192,10 @@ bool ExportTrajectory(TBABM& t,
   success &= tbTxNaiveAdults.Add(                     std::move(std::make_shared<decltype(data.tbTxNaiveAdults)>(data.tbTxNaiveAdults)), id);
   success &= tbTxNaiveInfectiousAdults.Add(           std::move(std::make_shared<decltype(data.tbTxNaiveInfectiousAdults)>(data.tbTxNaiveInfectiousAdults)), id);
 
-  success &= activeHouseholdContacts.Add(std::move(std::make_shared<decltype(data.activeHouseholdContacts)>(data.activeHouseholdContacts)));
+  success &= activeHouseholdContacts.Add(std::move(std::make_shared<decltype(data.activeHouseholdContacts)>(data.activeHouseholdContacts)), id);
+  success &= activeHouseholdContactsUnder5.Add(std::move(std::make_shared<decltype(data.activeHouseholdContactsUnder5)>(data.activeHouseholdContactsUnder5)), id);
+  success &= totalHouseholdContacts.Add(std::move(std::make_shared<decltype(data.totalHouseholdContacts)>(data.totalHouseholdContacts)), id);
+  success &= totalHouseholdContactsUnder5.Add(std::move(std::make_shared<decltype(data.totalHouseholdContactsUnder5)>(data.totalHouseholdContactsUnder5)), id);
 
   success &= t.WriteSurveys(populationSurvey, householdSurvey, deathSurvey);
 
@@ -269,7 +276,10 @@ bool WriteData(string outputPrefix)
       tbTxNaiveAdults.Write(outputPrefix + "tbTxNaiveAdults.csv") &&
       tbTxNaiveInfectiousAdults.Write(outputPrefix + "tbTxNaiveInfectiousAdults.csv") &&
 
-      activeHouseholdContacts.Write(outputPrefix + "activeHouseholdContacts.csv")
+      activeHouseholdContacts.Write(outputPrefix + "activeHouseholdContacts.csv") &&
+      activeHouseholdContacts.Write(outputPrefix + "activeHouseholdContactsUnder5.csv") &&
+      totalHouseholdContacts.Write(outputPrefix + "totalHouseholdContacts.csv") &&
+      totalHouseholdContactsUnder5.Write(outputPrefix + "totalHouseholdContactsUnder5.csv")
       );
 }
 

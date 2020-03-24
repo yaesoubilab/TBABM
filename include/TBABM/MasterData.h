@@ -89,9 +89,10 @@ class MasterData {
     IncidenceTimeSeries<int> ctDeathsAvertedChildren;
     HistT                    ctInfectiousnessAverted = make_histogram(axis::regular<>(12,0,365));
 
-    DiscreteTimeStatistic  activeHouseholdContacts; // For each individual diagnosed with active TB,
-    // the percentage of household contacts who have
-    // active TB.
+    IncidenceTimeSeries<int> activeHouseholdContacts;
+    IncidenceTimeSeries<int> activeHouseholdContactsUnder5;
+    IncidenceTimeSeries<int> totalHouseholdContacts;
+    IncidenceTimeSeries<int> totalHouseholdContactsUnder5;
 
     MasterData(int tMax, int pLength, std::vector<double> ageBreaks);
 

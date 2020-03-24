@@ -35,13 +35,17 @@ TB::SetHouseholdCallbacks(
   function<void(Time)>       progression, 
   function<void(Time)>       recovery,
   function<double(void)>     householdPrevalence,
-  function<double(TBStatus)> contactHouseholdPrevalence)
+  function<double(TBStatus)> contactHouseholdPrevalence,
+  function<int(int, int)>    householdTBCases,
+  function<int(int, int)>    householdSize)
 {
   if (!(contactTrace &&
         progression && 
         recovery && 
         householdPrevalence && 
-        contactHouseholdPrevalence)) {
+        contactHouseholdPrevalence &&
+        householdTBCases &&
+        householdSize)) {
 
     printf("A household callback in SetHouseholdCallbacks was empty\n");
     exit(1);
@@ -52,6 +56,8 @@ TB::SetHouseholdCallbacks(
   RecoveryHandler              = recovery;
   HouseholdTBPrevalence        = householdPrevalence;
   ContactHouseholdTBPrevalence = contactHouseholdPrevalence;
+  HouseholdTBCases             = householdTBCases;
+  HouseholdSize                = householdSize;
 }
 
   void
@@ -62,6 +68,8 @@ TB::ResetHouseholdCallbacks(void)
   RecoveryHandler              = nullptr;
   HouseholdTBPrevalence        = nullptr;
   ContactHouseholdTBPrevalence = nullptr;
+  HouseholdTBCases             = nullptr;
+  HouseholdSize                = nullptr;
 }
 
 // This function is an interface to the death mechanism provided

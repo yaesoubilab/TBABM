@@ -76,7 +76,9 @@ void Household::AddIndividual(shared_p<Individual> idv, int t, HouseholdPosition
 
     [this]      (void)  -> double { return ActiveTBPrevalence(); },
 
-    [this]      (TBStatus s)  -> double { return ContactActiveTBPrevalence(s); }
+    [this]      (TBStatus s)  -> double { return ContactActiveTBPrevalence(s); },
+    [this]      (int maxage, int t)->int { return infectiousIndividualsUnderAge(maxage, t); },
+    [this]      (int maxage, int t)->int { return individualsUnderAge(maxage, t); }
   );
 
   return;
@@ -170,6 +172,53 @@ int Household::size(int t) {
 
 int Household::size(void) {
   return nIndividuals;
+}
+
+int Household::individualsUnderAge(int maxage, int t) {
+
+  int count {0};
+
+  if (head && head->age(t) < maxage) count++;
+  if (spouse && spouse->age(t) < maxage) count++;
+
+  for (auto it = offspring.begin(); it != offspring.end(); it++) {
+    if (!*it || (*it)->dead) continue;
+    if ((*it)->age(t) < maxage) count++;
+  }
+
+  for (auto it = other.begin(); it != other.end(); it++) {
+    if (!*it || (*it)->dead) continue;
+    if ((*it)->age(t) < maxage) count++;
+  }
+
+  return count;
+}
+
+int Household::infectiousIndividualsUnderAge(int maxage, int t) {
+
+  int count {0};
+
+  if (head && head->age(t) < maxage && \
+      head->tb.GetTBStatus(t) == TBStatus::Infectious) count++;
+
+  if (spouse && spouse->age(t) < maxage && \
+      spouse->tb.GetTBStatus(t) == TBStatus::Infectious) count++;
+
+  for (auto it = offspring.begin(); it != offspring.end(); it++) {
+    if (!*it || (*it)->dead) continue;
+
+    if ((*it)->age(t) < maxage && \
+        (*it)->tb.GetTBStatus(t) == TBStatus::Infectious) count++;
+  }
+
+  for (auto it = other.begin(); it != other.end(); it++) {
+    if (!*it || (*it)->dead) continue;
+
+    if ((*it)->age(t) < maxage && \
+        (*it)->tb.GetTBStatus(t) == TBStatus::Infectious) count++;
+  }
+
+  return count;
 }
 
 bool Household::hasMember(weak_p<Individual> idv_w) {

@@ -77,7 +77,13 @@ TB::TreatmentBegin(Time t, const bool flag_override)
     else if (tb_treatment_status == TBTreatmentStatus::Complete)
       data.tbCompletedTreatment.Record(ts, -1);
 
-    data.activeHouseholdContacts.Record(prev_household);
+    int maxage = 150;
+
+    data.activeHouseholdContacts.Record(ts, HouseholdTBCases(maxage, ts) - 1);
+    data.totalHouseholdContacts.Record(ts, HouseholdSize(maxage, ts) - 1);
+
+    data.activeHouseholdContactsUnder5.Record(ts, HouseholdTBCases(5, ts) - 1);
+    data.totalHouseholdContactsUnder5.Record(ts, HouseholdSize(5, ts) - 1);
 
     tb_treatment_status = TBTreatmentStatus::Incomplete;
 

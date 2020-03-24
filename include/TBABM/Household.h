@@ -32,6 +32,14 @@ class Household {
     int size(int t);
     int size(void);
 
+    // The number of individuals who are UNDER (<) 'maxage' who live in
+    // the household
+    int individualsUnderAge(int maxage, int t);
+
+    // The number of INFECTIOUS individuals who are UNDER (<) 'maxage' who live
+    // in the household
+    int infectiousIndividualsUnderAge(int maxage, int t);
+
     bool hasMember(weak_p<Individual> idv);
 
     // ActiveTBPrevalence is simply the fraction of individuals
