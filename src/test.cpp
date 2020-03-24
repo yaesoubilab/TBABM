@@ -277,7 +277,7 @@ bool WriteData(string outputPrefix)
       tbTxNaiveInfectiousAdults.Write(outputPrefix + "tbTxNaiveInfectiousAdults.csv") &&
 
       activeHouseholdContacts.Write(outputPrefix + "activeHouseholdContacts.csv") &&
-      activeHouseholdContacts.Write(outputPrefix + "activeHouseholdContactsUnder5.csv") &&
+      activeHouseholdContactsUnder5.Write(outputPrefix + "activeHouseholdContactsUnder5.csv") &&
       totalHouseholdContacts.Write(outputPrefix + "totalHouseholdContacts.csv") &&
       totalHouseholdContactsUnder5.Write(outputPrefix + "totalHouseholdContactsUnder5.csv")
       );

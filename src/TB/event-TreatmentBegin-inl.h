@@ -79,11 +79,21 @@ TB::TreatmentBegin(Time t, const bool flag_override)
 
     int maxage = 150;
 
-    data.activeHouseholdContacts.Record(ts, HouseholdTBCases(maxage, ts) - 1);
-    data.totalHouseholdContacts.Record(ts, HouseholdSize(maxage, ts) - 1);
+    data.activeHouseholdContacts.Record(ts,
+      std::max(0, HouseholdTBCases(maxage, ts) - 1)
+    );
 
-    data.activeHouseholdContactsUnder5.Record(ts, HouseholdTBCases(5, ts) - 1);
-    data.totalHouseholdContactsUnder5.Record(ts, HouseholdSize(5, ts) - 1);
+    data.totalHouseholdContacts.Record(ts,
+      std::max(0, HouseholdSize(maxage, ts) - 1)
+    );
+
+    data.activeHouseholdContactsUnder5.Record(ts,
+      std::max(0, HouseholdTBCases(5, ts) - 1)
+    );
+
+    data.totalHouseholdContactsUnder5.Record(ts,
+      std::max(0, HouseholdSize(5, ts) - 1)
+    );
 
     tb_treatment_status = TBTreatmentStatus::Incomplete;
 

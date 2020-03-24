@@ -36,7 +36,7 @@ calibrationData_raw <- tibble::tibble(
   prevalenceInfectiousExperiencedAdults = c(0.0299, NA, NA, NA, NA, NA, NA),
   prevalenceInfectiousHouseholdContacts = c(0.031, NA, NA, NA, NA, NA, NA),
   prevalenceInfectiousHouseholdContactsUnder5
-                                        = c(0.10, NA, NA, NA, NA, NA, NA),
+                                        = c(0.10, NA, NA, NA, NA, NA, NA)
 )
 
 calibrationData <- ReformatRawCalibData(calibrationData_raw)
@@ -46,7 +46,7 @@ tar_notif_tb_children <-
        model=c('tbTreatmentBeginChildren',
                'populationChildren'),
        observed=calibrationData$notifiedTBChildren,
-       size=calibrationData_raw$populationChildren)
+       size=calibrationData$populationChildren)
 
 tar_notif_tb_exp_adults <- 
   list(type='TS',
@@ -66,25 +66,25 @@ tar_prevalence_HIV <-
   list(type='TS',
        model=c('hivPositive', 'populationSize'),
        observed=calibrationData$prevalenceHIV,
-       size=1894)
+       size=tibble(year=2002, value=1894))
 
 tar_prev_exp_adults <-
   list(type='TS',
        model=c('tbTxExperiencedAdults', 'populationSize'),
        observed=calibrationData$prevalenceExperiencedAdults,
-       size=2781)
+       size=tibble(year=2002, value=2781))
 
 tar_prev_inf_naive_adults <-
   list(type='TS',
        model=c('tbTxNaiveInfectiousAdults', 'tbTxNaiveAdults'),
        observed=calibrationData$prevalenceInfectiousNaiveAdults,
-       size=3119)
+       size=tibble(year=2002, value=3119))
 
 tar_prev_inf_exp_adults <-
   list(type='TS',
        model=c('tbTxExperiencedInfectiousAdults', 'tbTxExperiencedAdults'),
        observed=calibrationData$prevalenceInfectiousExperiencedAdults,
-       size=338)
+       size=tibble(year=2002, value=338))
 
 tar_prev_inf_household_contacts <-
   list(type='TS',
