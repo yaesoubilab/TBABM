@@ -44,21 +44,24 @@ calibrationData <- ReformatRawCalibData(calibrationData_raw)
 tar_notif_tb_children <-
   list(type='TS',
        model=c('tbTreatmentBeginChildren',
-               'populationChildren'),
+               'tbInfectious'),
+             # 'populationChildren'),
        observed=calibrationData$notifiedTBChildren,
-       size=calibrationData$populationChildren)
+       size='model')
 
 tar_notif_tb_exp_adults <- 
   list(type='TS',
        model=c('tbTreatmentBeginAdultsExperienced',
-               'tbTxExperiencedAdults'),
+               'tbInfectious'),
+             # 'tbTxExperiencedAdults'),
        observed=calibrationData$notifiedTBExperiencedAdults,
        size='model')
 
 tar_notif_tb_naive_adults <-
   list(type='TS',
        model=c('tbTreatmentBeginAdultsNaive',
-               'tbTxNaiveAdults'),
+               'tbInfectious'),
+             # 'tbTxNaiveAdults'),
        observed=calibrationData$notifiedTBNaiveAdults,
        size='model')
 
@@ -143,12 +146,12 @@ processLines <- function() {
 
     # Try to calibrate the model whose results are in this directory
     msg        <- paste0("Error in calculating likelihood for '", runID, "'")
-    likelihood <- tryInform(CalibrateTargets(targets), msg) 
+    likelihood <- tryInform(CalibrateTargets(targets, verbose=TRUE), msg) 
     
     tryInform(setwd('..'),
               paste0("Could not exit '",runID,"' after calculating likelihood"))   
 
-    write(paste0(line, ',', as.character(likelihood)),
+    write(paste0(line, ',', as.character(likelihood), ',', names(likelihood)),
           stdout())
   }
 }

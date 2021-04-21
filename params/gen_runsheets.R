@@ -273,8 +273,8 @@ main <- function(args) {
     message("Generating runsheets")
     runsheets <- GenRunSheets_subst(proto_fname, # the proto runsheet
                                     file_fname,  # the runsheets we're substituting into
-                                    args[3],
-                                    opts$`num-samples`)# the prior file we're using to drive the substition
+                                    args[3],     # the prior file we're using to drive the substition
+                                    opts$`num-samples`)
     vs        <- runsheets$vs
     runsheets <- runsheets$dfs
   } else if (opts$range) {
