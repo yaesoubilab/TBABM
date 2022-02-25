@@ -44,24 +44,24 @@ calibrationData <- ReformatRawCalibData(calibrationData_raw)
 tar_notif_tb_children <-
   list(type='TS',
        model=c('tbTreatmentBeginChildren',
-               'tbInfectious'),
-             # 'populationChildren'),
+             # 'tbInfectious'),
+               'populationChildren'),
        observed=calibrationData$notifiedTBChildren,
        size='model')
 
 tar_notif_tb_exp_adults <- 
   list(type='TS',
        model=c('tbTreatmentBeginAdultsExperienced',
-               'tbInfectious'),
-             # 'tbTxExperiencedAdults'),
+             # 'tbInfectious'),
+               'tbTxExperiencedAdults'),
        observed=calibrationData$notifiedTBExperiencedAdults,
        size='model')
 
 tar_notif_tb_naive_adults <-
   list(type='TS',
        model=c('tbTreatmentBeginAdultsNaive',
-               'tbInfectious'),
-             # 'tbTxNaiveAdults'),
+             # 'tbInfectious'),
+               'tbTxNaiveAdults'),
        observed=calibrationData$notifiedTBNaiveAdults,
        size='model')
 
