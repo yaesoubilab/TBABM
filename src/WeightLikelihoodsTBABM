@@ -40,7 +40,7 @@ processLines <- function() {
   assert_that(noNA(results$seed),       msg=">= 1 seed (col 2) was NA")
   assert_that(noNA(results$likelihood), msg=">= 1 likelihood (col 3) was NA")
 
-  results <- mutate(results, likelihood = str_remove_all(likelihood, ","))
+  results <- mutate(results, likelihood = as.double(str_remove_all(likelihood, ",")))
 
   log_lks <- as.double(results$likelihood) %>%
     ifelse(is.nan(.), -Inf, .)
