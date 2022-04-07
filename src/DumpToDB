@@ -6,6 +6,7 @@ library(tibble)
 library(stringr)
 library(readr)
 library(purrr)
+library(dplyr)
 
 'usage:
   DumpToDB.R -o <sqlite> [--exclude <excludes>] [--excludeCols <cols>]
@@ -22,8 +23,10 @@ opts <- docopt(doc)
 
 # Empty schemas, keyed on basename
 schemas <- list()
+tables  <- list()
 n       <- 0
-conn    <- dbConnect(RSQLite::SQLite(), dbname = opts$o)
+conn    <- dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+conn2   <- dbConnect(RSQLite::SQLite(), dbname = opts$o)
 
 excludes <-
   if (is.null(opts$exclude)) character(0) else stringr::str_split(opts$exclude, ',')[[1]];
@@ -39,18 +42,26 @@ updateSchema <- function(schemas, path) {
   schemas
 }
 
-loadTableIntoList <- function(lst, path, schemas) {
+loadTableIntoList <- function(lst, path, schemas, id) {
   basename_ <- basename(path)
-  lst[[basename_]] <- readr::read_csv(path, col_types = schemas[[basename_]])
-  lst
-}
 
-loadRowsIntoTable <- function(rows, basename_, conn, id) {
-
-  tableName <- sanitizeTableName(basename_)
+  rows <- readr::read_csv(path, col_types = schemas[[basename_]])
+  # rows <- readr::read_csv(path, col_types = schemas[[basename_]], lazy = FALSE)
 
   rows$id <- id
   rows[,excludeCols] <- NULL
+
+  if (!basename_ %in% names(lst))
+    lst[[basename_]] <- rows
+  else                                             
+    lst[[basename_]] <- bind_rows(lst[[basename_]], rows)
+
+  lst
+}
+
+loadRowsIntoTable <- function(rows, basename_, conn) {
+
+  tableName <- sanitizeTableName(basename_)
 
   if (!dbExistsTable(conn, tableName))
     dbCreateTable(conn, name = tableName, fields = rows)
@@ -93,13 +104,29 @@ while(length(lineStr <- readLines(f, n = 1)) > 0) {
   if (n == 0)
     schemas <<- purrr::reduce(paths, updateSchema, .init = schemas)
 
-  tables <- purrr::reduce(paths, loadTableIntoList, schemas = schemas, .init = list())
+  tables <<- purrr::reduce(
+    paths, loadTableIntoList,  
+    schemas = schemas,  
+    id = runID,
+    .init = tables
+  )
 
-  iwalk(tables, loadRowsIntoTable, conn = conn, id = runID)
+  if (n %% 20 == 0) {
+    iwalk(tables, loadRowsIntoTable, conn = conn)
+
+    # Reset the tables-buffer
+    tables <<- list()
+  }
 
   write(lineStr, stdout())
 
-  n <<- n + 1
+  n <- n + 1
 }
 
+if (length(tables) != 0)
+  iwalk(tables, loadRowsIntoTable, conn = conn)
+
+sqliteCopyDatabase(conn, conn2)
+
 dbDisconnect(conn)
+dbDisconnect(conn2)
