@@ -1,0 +1,105 @@
+#!/usr/bin/Rscript
+library(docopt)
+library(DBI)
+library(RSQLite)
+library(tibble)
+library(stringr)
+library(readr)
+library(purrr)
+
+'usage:
+  DumpToDB.R -o <sqlite> [--exclude <excludes>] [--excludeCols <cols>]
+  DumpToDB.R -h | --help
+
+options:
+ -o <sqlite>             Where the SQLite db is. If it doesn\'t exist, it will be created.
+ --exclude <excludes>    Files that should not be dumped to the database, separate w/ commas
+ --excludeCols <cols>    Always exclude cols in `cols`. Separate w/ commas
+ -h --help    Show this screen' -> doc
+
+opts <- docopt(doc)
+
+
+# Empty schemas, keyed on basename
+schemas <- list()
+n       <- 0
+conn    <- dbConnect(RSQLite::SQLite(), dbname = opts$o)
+
+excludes <-
+  if (is.null(opts$exclude)) character(0) else stringr::str_split(opts$exclude, ',')[[1]];
+
+excludeCols <-
+  if (is.null(opts$excludeCols)) character(0) else stringr::str_split(opts$excludeCols, ',')[[1]];
+
+sanitizeTableName <- function(paths)
+  stringr::str_match(paths, '(.*)\\.[a-zA-Z0-9]+$')[,2]
+
+updateSchema <- function(schemas, path) {
+  schemas[[basename(path)]] <- readr::spec_csv(path)
+  schemas
+}
+
+loadTableIntoList <- function(lst, path, schemas) {
+  basename_ <- basename(path)
+  lst[[basename_]] <- readr::read_csv(path, col_types = schemas[[basename_]])
+  lst
+}
+
+loadRowsIntoTable <- function(rows, basename_, conn, id) {
+
+  tableName <- sanitizeTableName(basename_)
+
+  rows$id <- id
+  rows[,excludeCols] <- NULL
+
+  if (!dbExistsTable(conn, tableName))
+    dbCreateTable(conn, name = tableName, fields = rows)
+
+  dbAppendTable(conn, tableName, rows)
+} 
+
+tryInform <- function(code, message) {
+  handleError <- function(c) {
+    c$message <- paste0(c$message, "\n", '(', message, ')')
+    stop(c)
+  }
+
+  tryCatch(code, error=handleError)
+}
+
+# Open 'stdin' as a file descriptor
+f <- tryInform({f <- file('stdin'); open(f); f},
+               "Could not open 'stdin' for reading")
+
+# Read one line at a time until EOF
+while(length(lineStr <- readLines(f, n = 1)) > 0) {
+
+  # Each line should begin with a number, which is the folder name
+  # containing the files to be calibrated
+  dirname_ <- stringr::str_extract(lineStr, "^\\d+")
+  runID <- dirname_
+
+  paths <- normalizePath(
+    Sys.glob(file.path(dirname_, '*.csv')),
+    mustWork = TRUE
+  )
+
+  paths <- setdiff(paths, normalizePath(
+    Sys.glob(file.path(dirname_, excludes)))
+  )
+
+  # If this is the first line read, generate a schema for the data in that
+  # directory 
+  if (n == 0)
+    schemas <<- purrr::reduce(paths, updateSchema, .init = schemas)
+
+  tables <- purrr::reduce(paths, loadTableIntoList, schemas = schemas, .init = list())
+
+  iwalk(tables, loadRowsIntoTable, conn = conn, id = runID)
+
+  write(lineStr, stdout())
+
+  n <<- n + 1
+}
+
+dbDisconnect(conn)
