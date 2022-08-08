@@ -71,15 +71,19 @@ TB::InfectionRiskEvaluate_impl(Time t, int risk_window_local, shared_p<TB> l_ptr
   // Calculate size of risk from the community, and size of risk from the 
   // household. "TB_risk_global" and "TB_risk_household" are constants, despite
   // the fact that a .Sample method is called on them.
+  
+  long double base_global_risk {params["TB_risk_global"].Sample(rng)};
+
   long double risk_global     {under5_extrarisk * \
                                reduction * \
                                GlobalTBPrevalence(t) * \
-                               params["TB_risk_global"].Sample(rng)};
+                               base_global_risk};
 
   long double risk_household  {under5_extrarisk * \
                                reduction * \
                                ContactHouseholdTBPrevalence(tb_status) * \
-                               params["TB_risk_household"].Sample(rng)};
+                               base_global_risk * \
+                               params["TB_risk_household_scalar"].Sample(rng)};
 
   // Time to infection for global and local. If any of these risks are zero,
   // change to a really small number since you can't sample 0-rate exponentials
