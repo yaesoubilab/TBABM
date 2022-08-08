@@ -50,12 +50,12 @@ TB - Reactivation rate - TI+badHIV,TB_reac_TI_badHIV,v,Exponential,(rate-shift),
 TB - Rate(death from conv),TB_t_death,v,Exponential,(rate-shift),0.285,0,,,T
 TB - Rate(death from conv),TB_t_death_goodHIV,v,Exponential,(rate-shift),0.285,0,,,T
 TB - Rate(death from conv),TB_t_death_badHIV,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - noHIV,TB_t_seek_tx,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - goodHIV,TB_t_seek_tx_goodHIV,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - badHIV,TB_t_seek_tx_badHIV,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - pt+noHIV,TB_t_seek_tx_pt,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - pt+goodHIV,TB_t_seek_tx_pt_goodHIV,v,Exponential,(rate-shift),1,0,,,T
-TB - Rate(seek Tx from conv) - pt+badHIV,TB_t_seek_tx_pt_badHIV,v,Exponential,(rate-shift),1,0,,,T
+TB - Rate(seek Tx from conv) - noHIV - base rate,TB_seek_tx_base_rate,v,Constant,(value),1,,,,T
+TB - Rate(seek Tx from conv) - goodHIV - scalar relative to base rate,TB_seek_tx_goodHIV_scalar,v,Constant,(value),1,,,,T
+TB - Rate(seek Tx from conv) - badHIV - scalar relative to base rate,TB_seek_tx_badHIV_scalar,v,Constant,(value),1,,,,T
+TB - Rate(seek Tx from conv) - pt+noHIV - scalar relative to base rate,TB_seek_tx_pt_scalar,v,Constant,(value),1,,,,T
+TB - Rate(seek Tx from conv) - pt+goodHIV - scalar relative to base rate,TB_seek_tx_pt_goodHIV_scalar,v,Constant,(value),1,,,,T
+TB - Rate(seek Tx from conv) - pt+badHIV - scalar relative to base rate,TB_seek_tx_pt_badHIV_scalar,v,Constant,(value),1,,,,T
 TB - Rate(recovery from conv),TB_t_recov,v,Exponential,(rate-shift),0.2,0,,,T
 TB - Rate(recovery from conv),TB_t_recov_goodHIV,v,Exponential,(rate-shift),0.1,0,,,T
 TB - Rate(recovery from conv),TB_t_recov_badHIV,v,Exponential,(rate-shift),0.000001,0,,,T

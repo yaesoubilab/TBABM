@@ -60,40 +60,45 @@ TB::InfectInfectious(Time t, Source s, StrainType)
     Param t_recov;
 
     HIVType hiv_cat = GetHIVType(ts);
+
+    long double seek_tx_base_rate { params["TB_seek_tx_base_rate"].Sample(rng) };
     
     if (treatment_experienced) {
       if (hiv_cat == HIVType::Neg) {
-        t_seek_tx = params["TB_t_seek_tx_pt"];
-        t_death   = params["TB_t_death"];
-        t_recov   = params["TB_t_recov"];
+        seek_tx_base_rate  *= params["TB_seek_tx_pt_scalar"].Sample(rng);
+        t_death             = params["TB_t_death"];
+        t_recov             = params["TB_t_recov"];
       } else if (hiv_cat == HIVType::Good) {
-        t_seek_tx = params["TB_t_seek_tx_pt_goodHIV"];
-        t_death   = params["TB_t_death_goodHIV"];
-        t_recov   = params["TB_t_recov_goodHIV"];
+        seek_tx_base_rate  *= params["TB_seek_tx_pt_goodHIV_scalar"].Sample(rng);
+        t_death             = params["TB_t_death_goodHIV"];
+        t_recov             = params["TB_t_recov_goodHIV"];
       } else {
-        t_seek_tx = params["TB_t_seek_tx_pt_badHIV"];
-        t_death   = params["TB_t_death_badHIV"];
-        t_recov   = params["TB_t_recov_badHIV"];
+        seek_tx_base_rate  *= params["TB_seek_tx_pt_badHIV_scalar"].Sample(rng);
+        t_death             = params["TB_t_death_badHIV"];
+        t_recov             = params["TB_t_recov_badHIV"];
       }
     } else {
       if (hiv_cat == HIVType::Neg) {
-        t_seek_tx = params["TB_t_seek_tx"];
-        t_death   = params["TB_t_death"];
-        t_recov   = params["TB_t_recov"];
+        seek_tx_base_rate  *= 1;
+        t_death             = params["TB_t_death"];
+        t_recov             = params["TB_t_recov"];
       } else if (hiv_cat == HIVType::Good) {
-        t_seek_tx = params["TB_t_seek_tx_goodHIV"];
-        t_death   = params["TB_t_death_goodHIV"];
-        t_recov   = params["TB_t_recov_goodHIV"];
+        seek_tx_base_rate  *= params["TB_seek_tx_goodHIV_scalar"].Sample(rng);
+        t_death             = params["TB_t_death_goodHIV"];
+        t_recov             = params["TB_t_recov_goodHIV"];
       } else {
-        t_seek_tx = params["TB_t_seek_tx_badHIV"];
-        t_death   = params["TB_t_death_badHIV"];
-        t_recov   = params["TB_t_recov_badHIV"];
+        seek_tx_base_rate  *= params["TB_seek_tx_badHIV_scalar"].Sample(rng);
+        t_death             = params["TB_t_death_badHIV"];
+        t_recov             = params["TB_t_recov_badHIV"];
       }
     }
 
+    // We have now computed the rate of seeking treatment for this individual.
+    auto seek_tx_rate = seek_tx_base_rate;
+
     auto timeToNaturalRecovery	= t_recov.Sample(rng);
     auto timeToDeath            = t_death.Sample(rng);
-    auto timeToSeekingTreatment = t_seek_tx.Sample(rng);
+    auto timeToSeekingTreatment = Exponential(seek_tx_rate)(rng.mt_);
 
     auto winner =
       std::min({timeToNaturalRecovery,
