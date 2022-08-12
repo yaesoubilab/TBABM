@@ -61,7 +61,7 @@ TB::InfectInfectious(Time t, Source s, StrainType)
 
     HIVType hiv_cat = GetHIVType(ts);
 
-    long double seek_tx_base_rate { params["TB_seek_tx_base_rate"].Sample(rng) };
+    long double seek_tx_base_rate { 1.0/params["TB_seek_tx_base_time"].Sample(rng) };
     
     if (treatment_experienced) {
       if (hiv_cat == HIVType::Neg) {
