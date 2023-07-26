@@ -5,7 +5,7 @@ In order to run TBABM on a SLURM-managed cluster, you must compile the binaries 
 First, acquire an interactive allocation with several cores, to speed compile time.
 
 ```bash
-srun --pty -p interactive --cpus-per-task=8 --time=60 bash
+srun --pty -p devel --cpus-per-task=4 --time=60 bash
 ```
 
 You should now be inside an interactive job allocation, which will allow you to build binaries in an appropriate environment.
@@ -25,7 +25,7 @@ export PREFIX
 Next, we load a toolchain, and load CMake, our build system:
 
 ```bash
-module load CMake/3.9.1 foss/2018b || echo "Loading one or more modules failed!"
+module load CMake/3.24.3-GCCcore-12.2.0 foss/2022b || echo "Loading one or more modules failed!"
 ```
 
 Next, clone all the repositories:
@@ -39,6 +39,8 @@ Compile and install them:
 
 ```bash
 cd StatisticalDistributionsLib
+module load Boost
+module load foss/2022b
 cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=RelWithDebInfo .
 make -j8 install
 
@@ -70,7 +72,7 @@ rm -rf ~/tmp
 ### Installing TBABM
 
 ```bash
-VERSION=0.6.6
+VERSION=0.9.3.4
 
 mkdir ~/pkg ~/modulefiles/TBABM
 module use ~/modulefiles
@@ -79,6 +81,10 @@ cd ~/pkg
 git clone --branch=$VERSION https://github.com/yaesoubilab/TBABM.git $VERSION/
 
 cd $VERSION
+# Get Boost
+git submodule init; git submodule sync; git submodule update --recommend-shallow
+# Install docopt
+git clone https://github.com/docopt/docopt.cpp && cd docopt.cpp && cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . && make install && cd .. && rm -rf docopt.cpp
 cmake -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_BUILD_TYPE=RelWithDebInfo .
 make -j8
 
