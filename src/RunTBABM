@@ -136,7 +136,7 @@ fi
 if [[ "$DO_BATCH" = true ]]; then
   SBATCH_OPTSTRING=""
   SBATCH_OPTSTRING+="--time=$RUNTIME "
-  SBATCH_OPTSTRING+='--partition=general '
+  SBATCH_OPTSTRING+='--partition=day '
   SBATCH_OPTSTRING+="--job-name=$RUN_NAME "
   SBATCH_OPTSTRING+='--output=slurm.log '
   SBATCH_OPTSTRING+="--ntasks=$((N_JOBS+1)) " # Extra job is for this script
@@ -159,8 +159,8 @@ fi
 
 # Load dependencies: use Lmod if in cluster environment
 if module help > /dev/null 2>&1; then
-  module load foss/2018b || \
-    { (>&2 echo 'Loading foss/2018b failed; exiting'); exit $E_RUNERR; };
+  module load foss/2022b || \
+    { (>&2 echo 'Loading foss/2022b failed; exiting'); exit $E_RUNERR; };
   module load parallel || \
     { (>&2 echo 'Loading parallel failed; exiting');   exit $E_RUNERR; };
 fi
