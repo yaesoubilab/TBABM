@@ -18,6 +18,13 @@ TB::GetTBStatus(Time t)
   return tb_status;
 }
 
+void
+TB::SetTreatmentComplete()
+{
+  tb_treatment_status = TBTreatmentStatus::Complete;
+  return;
+}
+
   TB::HIVType
 TB::GetHIVType(Time t)
 {

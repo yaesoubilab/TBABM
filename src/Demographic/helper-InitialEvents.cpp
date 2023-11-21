@@ -36,5 +36,16 @@ void TBABM::InitialEvents(weak_p<Individual> idv_w, double t, double dt)
       timeToLooking < dt)
     Schedule(t + 365*timeToLooking, SingleToLooking(idv));
 
+  if (params["TB_p_initial_treatment"].Sample(rng)) {
+    data.tbTxExperiencedAdults.Record(t, +1);
+
+    data.tbTreatmentEnd.Record(t, +1);
+    data.tbCompletedTreatment.Record(t, +1);
+    data.tbRecoveries.Record(t, +1);
+    data.tbLatent.Record(t, +1);
+
+    idv->tb.SetTreatmentComplete();
+  }
+
   return;
 }

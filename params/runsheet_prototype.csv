@@ -29,6 +29,7 @@ HIV prevalence - 1990,HIV_prevalence_1990,f,HIV/prevalence - 1990.json,,,,,,
 Exogenous birth rate,annualBirthRate,v,Constant,(value),0.02,,,,F
 TB - Initial infection probability,TB_p_init_infect,v,Bernoulli,p,0.12,,,,T
 TB - Initial active probability,TB_p_init_active,v,Bernoulli,p,0.05,,,,T
+TB - Initial treatment-experienced probability,TB_p_initial_treatment,v,Bernoulli,p,0.05,,,,T
 TB - Under 5 risk scalar,TB_under5_scalar,v,Constant,(value),5,,,,T
 TB - Global infection constant,TB_risk_global,v,Constant,(value),6,,,,T
 TB - Household infection constant,TB_risk_household,v,Constant,(value),10,,,,T

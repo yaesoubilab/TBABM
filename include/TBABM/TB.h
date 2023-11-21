@@ -76,6 +76,7 @@ class TB
       }
 
     TBStatus GetTBStatus(Time);
+    void SetTreatmentComplete();
     bool PreviouslyTreated(void);
 
     void SetHouseholdCallbacks(
